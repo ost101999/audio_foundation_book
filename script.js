@@ -157,14 +157,21 @@ function downloadAudio(blob, id) {
 function playAudio(id) {
     const audioPath = `./audio/${id}.webm`;
     const audio = new Audio(audioPath);
+    const card = document.getElementById(id);
+    
+    // Visual feedback: adding 'playing' class
+    card.classList.add('playing');
     
     audio.play().catch(err => {
         console.warn(`Audio file not found: ${audioPath}`);
-        // Visual feedback for missing file
-        const card = document.getElementById(id);
         card.style.borderColor = '#e74c3c';
         setTimeout(() => card.style.borderColor = 'transparent', 500);
+        card.classList.remove('playing');
     });
+
+    audio.onended = () => {
+        card.classList.remove('playing');
+    };
 }
 
 // Start the app
