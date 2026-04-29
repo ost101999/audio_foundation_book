@@ -132,29 +132,6 @@ input:checked + .slider:before {
     border-radius: 50%;
 }
 
-/* Folder Button - Floating/Discrete */
-.btn-folder {
-    position: fixed;
-    bottom: 30px;
-    right: 30px; /* Floating at the bottom right */
-    z-index: 1000;
-    padding: 12px 24px;
-    background: var(--secondary-color);
-    color: white;
-    border-radius: 50px;
-    border: none;
-    box-shadow: 0 8px 20px rgba(243, 156, 18, 0.4);
-    font-size: 0.9rem;
-    font-family: var(--font-ui);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.btn-folder:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 25px rgba(243, 156, 18, 0.5);
-}
-
 .hidden {
     display: none !important;
 }
