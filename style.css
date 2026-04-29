@@ -1,0 +1,245 @@
+:root {
+    --primary-color: #4a90e2;
+    --secondary-color: #f39c12;
+    --danger-color: #e74c3c;
+    --bg-color: #f8faff;
+    --card-bg: #ffffff;
+    --text-color: #2c3e50;
+    --font-ui: 'Tajawal', sans-serif;
+    --font-word: 'Amiri', serif;
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: var(--font-ui);
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+    width: 100%;
+}
+
+/* Header */
+.main-header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 10px 0;
+    box-shadow: var(--shadow);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+h1 {
+    font-size: 1.2rem;
+    color: var(--primary-color);
+}
+
+.mode-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* Mode Switcher */
+.mode-switcher {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Increased gap */
+    background: #f0f3f6;
+    padding: 6px 18px;
+    border-radius: 30px;
+}
+
+.mode-label {
+    font-weight: 500;
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    white-space: nowrap;
+    flex-shrink: 0; /* Prevent shrinking */
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #bdc3c7;
+    transition: var(--transition);
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: var(--transition);
+}
+
+input:checked + .slider {
+    background-color: var(--secondary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(-24px); 
+}
+
+.slider.round {
+    border-radius: 34px;
+}
+
+.slider.round:before {
+    border-radius: 50%;
+}
+
+/* Buttons */
+.btn {
+    padding: 8px 16px;
+    border-radius: 10px;
+    border: none;
+    font-family: var(--font-ui);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+    white-space: nowrap;
+}
+
+.btn-secondary {
+    background-color: #ecf0f1;
+    color: #2c3e50;
+    border: 1px solid #dcdde1;
+}
+
+.btn-secondary:hover {
+    background-color: #bdc3c7;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* Main Content - Centered and Filling Screen */
+.content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+    overflow: hidden; /* Prevent body scroll if possible */
+}
+
+.words-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, 1fr);
+    gap: 12px;
+    width: 100%;
+    max-width: 700px;
+    height: calc(100vh - 140px); /* Fill available height */
+    max-height: 750px;
+    margin: 0 auto;
+}
+
+/* Cards */
+.word-card {
+    background: var(--card-bg);
+    border-radius: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--font-word);
+    font-size: clamp(2rem, 8vh, 3.5rem); /* Responsive font size */
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    user-select: none;
+    border: 2px solid transparent;
+}
+
+.word-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+.word-card:active {
+    transform: scale(0.95);
+}
+
+/* Mode Specific Styles */
+body.teacher-mode .word-card:hover {
+    border-color: var(--danger-color);
+}
+
+.word-card.recording {
+    background-color: #fff5f5;
+    border-color: var(--danger-color);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
+    70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
+}
+
+/* Footer */
+.main-footer {
+    padding: 20px;
+    text-align: center;
+    color: #95a5a6;
+    font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+    .words-grid {
+        gap: 10px;
+    }
+    .word-card {
+        height: 100px;
+        font-size: 2.5rem;
+        border-radius: 15px;
+    }
+}
