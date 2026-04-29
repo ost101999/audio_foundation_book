@@ -15,12 +15,10 @@ let isTeacherMode = false;
 let mediaRecorder = null;
 let audioChunks = [];
 let currentlyRecordingId = null;
-let dirHandle = null; // To store the directory handle for direct saving
 
 // DOM Elements
 const wordsGrid = document.getElementById('wordsGrid');
 const modeToggle = document.getElementById('modeToggle');
-const selectFolderBtn = document.getElementById('selectFolderBtn');
 
 // Initialize App
 function init() {
@@ -46,24 +44,10 @@ function setupEventListeners() {
     modeToggle.addEventListener('change', (e) => {
         isTeacherMode = e.target.checked;
         document.body.classList.toggle('teacher-mode', isTeacherMode);
-        selectFolderBtn.classList.toggle('hidden', !isTeacherMode);
         
         // Stop any active recording if mode changes
         if (!isTeacherMode && currentlyRecordingId) {
             stopRecording();
-        }
-    });
-
-    selectFolderBtn.addEventListener('click', async () => {
-        try {
-            dirHandle = await window.showDirectoryPicker({
-                mode: 'readwrite'
-            });
-            selectFolderBtn.textContent = 'تم ضبط المجلد ✅';
-            selectFolderBtn.style.backgroundColor = '#2ecc71';
-            selectFolderBtn.style.color = 'white';
-        } catch (err) {
-            console.error("Directory selection cancelled or failed:", err);
         }
     });
 }
@@ -93,15 +77,9 @@ async function startRecording(id) {
             audioChunks.push(event.data);
         };
 
-        mediaRecorder.onstop = async () => {
+        mediaRecorder.onstop = () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            
-            if (dirHandle) {
-                await saveToDirectory(audioBlob, `${id}.webm`);
-            } else {
-                downloadAudio(audioBlob, id);
-            }
-            
+            downloadAudio(audioBlob, id);
             stream.getTracks().forEach(track => track.stop());
         };
 
@@ -120,25 +98,6 @@ function stopRecording() {
         mediaRecorder.stop();
         document.getElementById(currentlyRecordingId).classList.remove('recording');
         currentlyRecordingId = null;
-    }
-}
-
-// Direct save using File System Access API
-async function saveToDirectory(blob, fileName) {
-    try {
-        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
-        const writable = await fileHandle.createWritable();
-        await writable.write(blob);
-        await writable.close();
-        console.log(`Saved directly: ${fileName}`);
-    } catch (err) {
-        console.error("Failed to save directly, falling back to download:", err);
-        // Fallback to normal download if direct save fails
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = fileName;
-        a.click();
     }
 }
 
