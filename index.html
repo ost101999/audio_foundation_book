@@ -26,12 +26,6 @@
         </div>
     </header>
 
-    <nav class="page-nav">
-        <div class="container" id="pageTabs">
-            <!-- Page buttons will be generated here -->
-        </div>
-    </nav>
-
     <main class="content">
         <div class="container">
             <div id="wordsGrid" class="words-grid">
@@ -39,6 +33,18 @@
             </div>
         </div>
     </main>
+
+    <div class="pagination-bar">
+        <div class="container">
+            <button id="prevPage" class="pag-btn">▶</button>
+            <div class="page-info">
+                <span>صفحة</span>
+                <input type="number" id="pageInput" min="1" value="1">
+                <span>من <span id="totalPages">1</span></span>
+            </div>
+            <button id="nextPage" class="pag-btn">◀</button>
+        </div>
+    </div>
 
     <footer class="main-footer">
         <p>جميع الحقوق محفوظة &copy; 2026</p>

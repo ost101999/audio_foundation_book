@@ -1,32 +1,38 @@
-// Initial Data Structure
-const defaultData = {
-    "الحروف بالفتح": [
-        { id: "p1_w1", text: "أَ" }, { id: "p1_w2", text: "بَ" },
-        { id: "p1_w3", text: "تَ" }, { id: "p1_w4", text: "ثَ" },
-        { id: "p1_w5", text: "جَ" }, { id: "p1_w6", text: "حَ" },
-        { id: "p1_w7", text: "خَ" }, { id: "p1_w8", text: "دَ" },
-        { id: "p1_w9", text: "ذَ" }, { id: "p1_w10", text: "رَ" },
-        { id: "p1_w11", text: "زَ" }, { id: "p1_w12", text: "سَ" },
-        { id: "p1_w13", text: "شَ" }, { id: "p1_w14", text: "صَ" },
-        { id: "p1_w15", text: "ضَ" }, { id: "p1_w16", text: "طَ" }
-    ],
-    "الحروف بالكسر": [
-        { id: "p2_w1", text: "إِ" }, { id: "p2_w2", text: "بِ" },
-        { id: "p2_w3", text: "تِ" }, { id: "p2_w4", text: "ثِ" },
-        { id: "p2_w5", text: "جِ" }, { id: "p2_w6", text: "حِ" },
-        { id: "p2_w7", text: "خِ" }, { id: "p2_w8", text: "دِ" },
-        { id: "p2_w9", text: "ذِ" }, { id: "p2_w10", text: "رِ" },
-        { id: "p2_w11", text: "زِ" }, { id: "p2_w12", text: "سِ" },
-        { id: "p2_w13", text: "شِ" }, { id: "p2_w14", text: "صِ" },
-        { id: "p2_w15", text: "ضِ" }, { id: "p2_w16", text: "طِ" }
-    ]
-};
+// Initial Data Structure (Array of pages)
+const defaultData = [
+    {
+        name: "الصفحة الأولى",
+        words: [
+            { id: "p1_w1", text: "أَ" }, { id: "p1_w2", text: "بَ" },
+            { id: "p1_w3", text: "تَ" }, { id: "p1_w4", text: "ثَ" },
+            { id: "p1_w5", text: "جَ" }, { id: "p1_w6", text: "حَ" },
+            { id: "p1_w7", text: "خَ" }, { id: "p1_w8", text: "دَ" },
+            { id: "p1_w9", text: "ذَ" }, { id: "p1_w10", text: "رَ" },
+            { id: "p1_w11", text: "زَ" }, { id: "p1_w12", text: "سَ" },
+            { id: "p1_w13", text: "شَ" }, { id: "p1_w14", text: "صَ" },
+            { id: "p1_w15", text: "ضَ" }, { id: "p1_w16", text: "طَ" }
+        ]
+    },
+    {
+        name: "الصفحة الثانية",
+        words: [
+            { id: "p2_w1", text: "إِ" }, { id: "p2_w2", text: "بِ" },
+            { id: "p2_w3", text: "تِ" }, { id: "p2_w4", text: "ثِ" },
+            { id: "p2_w5", text: "جِ" }, { id: "p2_w6", text: "حِ" },
+            { id: "p2_w7", text: "خِ" }, { id: "p2_w8", text: "دِ" },
+            { id: "p2_w9", text: "ذِ" }, { id: "p2_w10", text: "رِ" },
+            { id: "p2_w11", text: "زِ" }, { id: "p2_w12", text: "سِ" },
+            { id: "p2_w13", text: "شِ" }, { id: "p2_w14", text: "صِ" },
+            { id: "p2_w15", text: "ضِ" }, { id: "p2_w16", text: "طِ" }
+        ]
+    }
+];
 
 // Load data from localStorage or use default
 let bookData = JSON.parse(localStorage.getItem('readingAppData')) || defaultData;
 
 // State Management
-let currentPage = Object.keys(bookData)[0];
+let currentPageIndex = 0;
 let isTeacherMode = false;
 let mediaRecorder = null;
 let audioChunks = [];
@@ -35,12 +41,15 @@ let dirHandle = null;
 
 // DOM Elements
 const wordsGrid = document.getElementById('wordsGrid');
-const pageTabs = document.getElementById('pageTabs');
 const modeToggle = document.getElementById('modeToggle');
+const pageInput = document.getElementById('pageInput');
+const totalPagesSpan = document.getElementById('totalPages');
+const prevPageBtn = document.getElementById('prevPage');
+const nextPageBtn = document.getElementById('nextPage');
 
 // Initialize App
 function init() {
-    renderTabs();
+    renderPagination();
     renderCards();
     setupEventListeners();
 }
@@ -50,36 +59,25 @@ function saveData() {
     localStorage.setItem('readingAppData', JSON.stringify(bookData));
 }
 
-// Render Page Navigation Tabs
-function renderTabs() {
-    pageTabs.innerHTML = '';
-    Object.keys(bookData).forEach(pageName => {
-        const btn = document.createElement('button');
-        btn.className = `nav-btn ${pageName === currentPage ? 'active' : ''}`;
-        btn.textContent = pageName;
-        btn.onclick = () => {
-            currentPage = pageName;
-            renderTabs();
-            renderCards();
-        };
-        pageTabs.appendChild(btn);
-    });
+// Update Pagination UI
+function renderPagination() {
+    totalPagesSpan.textContent = bookData.length;
+    pageInput.value = currentPageIndex + 1;
+    prevPageBtn.disabled = currentPageIndex === 0;
+    nextPageBtn.disabled = currentPageIndex === bookData.length - 1;
 }
 
 // Render Cards Dynamically
 function renderCards() {
     wordsGrid.innerHTML = '';
-    const words = bookData[currentPage];
+    const words = bookData[currentPageIndex].words;
     words.forEach(word => {
         const card = document.createElement('div');
         card.className = 'word-card';
         card.id = word.id;
         card.textContent = word.text;
         
-        // Left click for Recording/Playback
         card.addEventListener('click', () => handleCardClick(word.id));
-        
-        // Right click to EDIT word
         card.addEventListener('contextmenu', (e) => {
             e.preventDefault();
             editWord(word.id);
@@ -90,7 +88,7 @@ function renderCards() {
 }
 
 function editWord(id) {
-    const words = bookData[currentPage];
+    const words = bookData[currentPageIndex].words;
     const wordIndex = words.findIndex(w => w.id === id);
     if (wordIndex === -1) return;
 
@@ -101,7 +99,7 @@ function editWord(id) {
         renderCards();
     }
 }
-// Handle Mode Change
+// Handle Navigation & Mode Change
 function setupEventListeners() {
     modeToggle.addEventListener('change', (e) => {
         isTeacherMode = e.target.checked;
@@ -110,6 +108,32 @@ function setupEventListeners() {
         if (!isTeacherMode && currentlyRecordingId) {
             stopRecording();
         }
+    });
+
+    prevPageBtn.addEventListener('click', () => {
+        if (currentPageIndex > 0) {
+            currentPageIndex--;
+            renderPagination();
+            renderCards();
+        }
+    });
+
+    nextPageBtn.addEventListener('click', () => {
+        if (currentPageIndex < bookData.length - 1) {
+            currentPageIndex++;
+            renderPagination();
+            renderCards();
+        }
+    });
+
+    pageInput.addEventListener('change', (e) => {
+        let val = parseInt(e.target.value);
+        if (isNaN(val) || val < 1) val = 1;
+        if (val > bookData.length) val = bookData.length;
+        
+        currentPageIndex = val - 1;
+        renderPagination();
+        renderCards();
     });
 }
 

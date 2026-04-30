@@ -136,48 +136,75 @@ input:checked + .slider:before {
     display: none !important;
 }
 
-/* Page Navigation */
-.page-nav {
-    background: #fff;
-    padding: 10px 0;
-    border-bottom: 1px solid #edf2f7;
+/* Pagination Bar */
+.pagination-bar {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 15px 0;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.05);
+    position: sticky;
+    bottom: 0;
+    z-index: 100;
 }
 
-.page-nav .container {
+.pagination-bar .container {
     display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 5px;
-    scrollbar-width: none; /* Firefox */
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
 }
 
-.page-nav .container::-webkit-scrollbar {
-    display: none; /* Chrome/Safari */
-}
-
-.nav-btn {
-    padding: 8px 18px;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #64748b;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: var(--transition);
-}
-
-.nav-btn:hover {
-    background: #f1f5f9;
-    border-color: var(--primary-color);
-}
-
-.nav-btn.active {
+.pag-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
     background: var(--primary-color);
     color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: var(--transition);
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+}
+
+.pag-btn:hover {
+    transform: scale(1.1);
+    background: #357abd;
+}
+
+.pag-btn:disabled {
+    background: #cbd5e0;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
+.page-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: #4a5568;
+}
+
+#pageInput {
+    width: 60px;
+    padding: 8px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    text-align: center;
+    font-family: var(--font-ui);
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--primary-color);
+}
+
+#pageInput:focus {
     border-color: var(--primary-color);
-    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.2);
+    outline: none;
 }
 
 /* Main Content */
