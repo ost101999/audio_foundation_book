@@ -136,6 +136,15 @@ input:checked + .slider:before {
     display: none !important;
 }
 
+/* زر الإضافة يظهر فقط في وضع المعلم */
+.add-btn.teacher-only {
+    display: none;
+}
+
+body.teacher-mode .add-btn.teacher-only {
+    display: flex;
+}
+
 /* Pagination Bar */
 .pagination-bar {
     background: rgba(255, 255, 255, 0.9);
@@ -145,9 +154,12 @@ input:checked + .slider:before {
     position: sticky;
     bottom: 0;
     z-index: 100;
+    /* مرجع لزر الإضافة المطلق على الشاشات الكبيرة */
+    isolation: isolate;
 }
 
 .pagination-bar .container {
+    position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -185,9 +197,12 @@ input:checked + .slider:before {
 .page-info {
     display: flex;
     align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
     gap: 10px;
     font-weight: 700;
     color: #4a5568;
+    font-family: 'Acme', sans-serif; /* English Numbers Font */
 }
 
 #pageInput {
@@ -196,8 +211,8 @@ input:checked + .slider:before {
     border: 2px solid #e2e8f0;
     border-radius: 10px;
     text-align: center;
-    font-family: var(--font-ui);
-    font-size: 1.1rem;
+    font-family: 'Acme', sans-serif;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--primary-color);
 }
@@ -207,13 +222,39 @@ input:checked + .slider:before {
     outline: none;
 }
 
+.add-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px dashed var(--primary-color);
+    background: white;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: var(--transition);
+    position: absolute;
+    inset-inline-end: 20px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.add-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-style: solid;
+}
+
 /* Main Content */
 .content {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 15px;
+    min-height: 0; /* Important for flex child scaling */
 }
 
 .words-grid {
@@ -222,9 +263,10 @@ input:checked + .slider:before {
     grid-template-rows: repeat(4, 1fr);
     gap: 12px;
     width: 100%;
-    max-width: 600px;
-    aspect-ratio: 1 / 1.1; /* Maintain balanced shape */
-    margin: 0 auto;
+    max-width: 500px; /* Reduced for better mobile fit */
+    aspect-ratio: 1 / 1;
+    margin-inline: auto;
+    justify-self: center;
 }
 
 /* Cards */
@@ -263,62 +305,174 @@ input:checked + .slider:before {
     100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
 }
 
-/* Mobile Specific */
-@media (max-width: 480px) {
-    h1 { font-size: 1rem; }
-    .words-grid {
-        gap: 8px;
-        aspect-ratio: auto;
-        height: calc(100vh - 120px);
-    }
-    .word-card {
-        border-radius: 8px;
-        font-size: 1.8rem;
-    }
-}
-
-.word-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-}
-
-.word-card:active {
-    transform: scale(0.95);
-}
-
-/* Mode Specific Styles */
-body.teacher-mode .word-card:hover {
-    border-color: var(--danger-color);
-}
-
-.word-card.recording {
-    background-color: #fff5f5;
-    border-color: var(--danger-color);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-}
-
-/* Footer */
-.main-footer {
-    padding: 20px;
-    text-align: center;
-    color: #95a5a6;
-    font-size: 0.8rem;
-}
-
-/* Responsive */
+/* ——— عرض مخصص للهاتف ——— */
 @media (max-width: 600px) {
-    .words-grid {
+    html {
+        overflow-x: hidden;
+    }
+
+    .container {
+        padding-inline: 12px;
+        max-width: 100%;
+    }
+
+    .main-header {
+        padding-block: 10px;
+    }
+
+    .main-header .container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
         gap: 10px;
     }
+
+    .main-header h1 {
+        font-size: 0.95rem;
+        white-space: normal;
+        line-height: 1.35;
+        max-width: 100%;
+    }
+
+    .mode-controls {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .mode-switcher {
+        width: 100%;
+        max-width: min(100%, 360px);
+        justify-content: center;
+        gap: 12px;
+        padding: 6px 10px;
+    }
+
+    .mode-label {
+        font-size: 0.7rem;
+    }
+
+    .content {
+        padding: 8px 0;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .content .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+    }
+
+    /*
+      مربع الشبكة: ضلع = أصغر قيمة بين (عرض الشاشة − هامش) و(ارتفاع الشاشة − شريط التصفح والرأس)
+      لتفادي 95vw مع padding الحاوية (تمرير أفقي وانزياح بصري في RTL).
+    */
+    .words-grid {
+        --mobile-pad: 24px;
+        --chrome: 200px;
+        width: min(
+            calc(100vw - var(--mobile-pad)),
+            calc(100dvh - var(--chrome)),
+            100%
+        );
+        max-width: 100%;
+        aspect-ratio: 1;
+        height: auto;
+        margin-inline: auto;
+        gap: clamp(6px, 1.8vmin, 10px);
+        box-sizing: border-box;
+    }
+
     .word-card {
-        height: 100px;
-        font-size: 2.5rem;
-        border-radius: 15px;
+        border-radius: 10px;
+        font-size: clamp(1.2rem, 7.5vmin, 2rem);
+        padding: 2px;
+    }
+
+    .pagination-bar {
+        padding-block: 12px;
+        padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+    }
+
+    /* صف للمعلم فوق، ثم سابق | رقم الصفحة | تالي */
+    .pagination-bar .container {
+        display: grid;
+        grid-template-columns: minmax(44px, 52px) minmax(0, 1fr) minmax(44px, 52px);
+        grid-template-rows: auto auto;
+        column-gap: 10px;
+        row-gap: 12px;
+        align-items: center;
+        justify-items: stretch;
+    }
+
+    .add-btn {
+        grid-column: 1 / -1;
+        grid-row: 1;
+        position: static;
+        transform: none;
+        justify-self: center;
+        width: 40px;
+        height: 40px;
+        font-size: 1.35rem;
+    }
+
+    #prevPage {
+        grid-column: 1;
+        grid-row: 2;
+        justify-self: center;
+    }
+
+    .page-info {
+        grid-column: 2;
+        grid-row: 2;
+        gap: 6px;
+        padding: 10px 14px;
+        background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
+        border: 1px solid #dce3ec;
+        border-radius: 14px;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
+        font-size: 0.85rem;
+        min-height: 48px;
+    }
+
+    .page-info > span {
+        color: #475569;
+        font-family: var(--font-ui);
+        font-weight: 600;
+    }
+
+    .page-info #totalPages {
+        font-family: 'Acme', sans-serif;
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    #nextPage {
+        grid-column: 3;
+        grid-row: 2;
+        justify-self: center;
+    }
+
+    .pag-btn {
+        width: 48px;
+        height: 48px;
+        font-size: 1.05rem;
+        flex-shrink: 0;
+    }
+
+    #pageInput {
+        width: 3.25rem;
+        min-height: 40px;
+        padding: 6px 4px;
+        font-size: 1.05rem;
+        border-radius: 10px;
+        border-width: 1px;
+        background: #fff;
+    }
+
+    .main-footer {
+        font-size: 0.75rem;
+        padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
     }
 }

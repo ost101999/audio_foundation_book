@@ -52,6 +52,7 @@ const pageInput = document.getElementById('pageInput');
 const totalPagesSpan = document.getElementById('totalPages');
 const prevPageBtn = document.getElementById('prevPage');
 const nextPageBtn = document.getElementById('nextPage');
+const addPageBtn = document.getElementById('addPageBtn');
 
 // Initialize App
 function init() {
@@ -99,7 +100,7 @@ function editWord(id) {
     if (wordIndex === -1) return;
 
     const newText = prompt("أدخل النص الجديد للكلمة:", words[wordIndex].text);
-    if (newText !== null && newText.trim() !== "") {
+    if (newText !== null) {
         words[wordIndex].text = newText.trim();
         saveData();
         renderCards();
@@ -138,6 +139,25 @@ function setupEventListeners() {
         if (val > bookData.length) val = bookData.length;
         
         currentPageIndex = val - 1;
+        renderPagination();
+        renderCards();
+    });
+
+    addPageBtn.addEventListener('click', () => {
+        if (!isTeacherMode) return;
+        
+        const newPageIndex = bookData.length + 1;
+        const newPage = {
+            name: `الصفحة ${newPageIndex}`,
+            words: Array.from({ length: 16 }, (_, i) => ({
+                id: `p${newPageIndex}_w${i + 1}`,
+                text: "" // Empty words
+            }))
+        };
+        
+        bookData.push(newPage);
+        saveData();
+        currentPageIndex = bookData.length - 1; // Go to new page
         renderPagination();
         renderCards();
     });
