@@ -1,3 +1,19 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+    doc,
+    getDoc,
+    getFirestore,
+    onSnapshot,
+    serverTimestamp,
+    setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import {
+    getDownloadURL,
+    getStorage,
+    ref,
+    uploadBytes
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+
 // Initial Data Structure (Array of pages)
 const defaultData = [
     {
@@ -30,10 +46,44 @@ const defaultData = [
 
 /** نسخة الكتاب المشتركة مع كل من يفتح الموقع (ملف JSON بجانب index.html على الخادم) */
 const BOOK_JSON_FILE = 'readingAppData.json';
+const FIRESTORE_COLLECTION = "books";
+const FIRESTORE_DOC_ID = "reading-app";
+
+const firebaseConfig = window.FIREBASE_CONFIG || {};
+const hasFirebaseConfig = Boolean(firebaseConfig.apiKey) &&
+    !String(firebaseConfig.apiKey).includes("PUT_YOUR_");
+
+let firebaseDb = null;
+let bookDocRef = null;
+let firebaseStorage = null;
+let stopRealtimeSync = null;
+
+if (hasFirebaseConfig) {
+    const firebaseApp = initializeApp(firebaseConfig);
+    firebaseDb = getFirestore(firebaseApp);
+    firebaseStorage = getStorage(firebaseApp);
+    bookDocRef = doc(firebaseDb, FIRESTORE_COLLECTION, FIRESTORE_DOC_ID);
+} else {
+    console.warn("Firebase config is missing. App is running with local data only.");
+}
 
 let bookData;
 
 async function loadBookData() {
+    if (bookDocRef) {
+        try {
+            const snapshot = await getDoc(bookDocRef);
+            if (snapshot.exists()) {
+                const cloudData = snapshot.data();
+                if (Array.isArray(cloudData?.pages) && cloudData.pages.length > 0) {
+                    return cloudData.pages;
+                }
+            }
+        } catch (err) {
+            console.warn("Could not load from Firestore, trying local fallback.", err);
+        }
+    }
+
     try {
         const res = await fetch(BOOK_JSON_FILE, { cache: 'no-store' });
         if (res.ok) {
@@ -54,7 +104,26 @@ async function loadBookData() {
 
 function saveData() {
     localStorage.setItem('readingAppData', JSON.stringify(bookData));
-    persistBookJsonIfTeacher();
+    persistBookDataIfTeacher();
+}
+
+async function persistBookDataIfTeacher() {
+    if (!isTeacherMode) return;
+
+    if (bookDocRef) {
+        try {
+            await setDoc(bookDocRef, {
+                pages: bookData,
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+            return;
+        } catch (err) {
+            console.warn('Could not save shared book data to Firestore:', err);
+            alert("فشل حفظ التعديلات على السحابة. تأكد من اتصال الإنترنت وقواعد Firestore.");
+        }
+    }
+
+    await persistBookJsonIfTeacher();
 }
 
 async function persistBookJsonIfTeacher() {
@@ -70,7 +139,7 @@ async function persistBookJsonIfTeacher() {
         const blob = new Blob([JSON.stringify(bookData, null, 2)], {
             type: 'application/json;charset=utf-8'
         });
-        await saveToDirectory(blob, BOOK_JSON_FILE);
+        await saveToDirectory(blob, BOOK_JSON_FILE, false);
     } catch (err) {
         console.warn('Could not save shared book JSON:', err);
     }
@@ -105,6 +174,30 @@ async function init() {
     renderPagination();
     renderCards();
     setupEventListeners();
+    startRealtimeSync();
+}
+
+function startRealtimeSync() {
+    if (!bookDocRef) return;
+
+    if (stopRealtimeSync) {
+        stopRealtimeSync();
+    }
+
+    stopRealtimeSync = onSnapshot(bookDocRef, (snapshot) => {
+        if (!snapshot.exists()) return;
+        const cloudData = snapshot.data();
+        if (!Array.isArray(cloudData?.pages) || cloudData.pages.length === 0) return;
+
+        bookData = cloudData.pages;
+        currentPageIndex = Math.min(currentPageIndex, bookData.length - 1);
+        currentPageIndex = Math.max(0, currentPageIndex);
+        localStorage.setItem('readingAppData', JSON.stringify(bookData));
+        renderPagination();
+        renderCards();
+    }, (err) => {
+        console.warn("Realtime sync error:", err);
+    });
 }
 
 // Update Pagination UI
@@ -231,14 +324,6 @@ function setupEventListeners() {
 // Main Interaction Logic
 async function handleCardClick(id) {
     if (isTeacherMode) {
-        if (!dirHandle) {
-            try {
-                dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
-            } catch (err) {
-                console.warn("User cancelled directory picker.");
-            }
-        }
-
         if (currentlyRecordingId === id) {
             stopRecording();
         } else {
@@ -263,12 +348,8 @@ async function startRecording(id) {
 
         mediaRecorder.onstop = async () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            
-            if (dirHandle) {
-                await saveToDirectory(audioBlob, `${id}.webm`);
-            } else {
-                downloadAudio(audioBlob, id);
-            }
+
+            await saveAudioForWord(audioBlob, id);
             
             stream.getTracks().forEach(track => track.stop());
         };
@@ -283,13 +364,42 @@ async function startRecording(id) {
     }
 }
 
-async function saveToDirectory(blob, fileName) {
+async function saveAudioForWord(audioBlob, id) {
+    if (firebaseStorage) {
+        try {
+            const storageRef = ref(firebaseStorage, `audio/${id}.webm`);
+            await uploadBytes(storageRef, audioBlob, { contentType: 'audio/webm' });
+            console.log(`Uploaded successfully to Firebase Storage: ${id}.webm`);
+            return;
+        } catch (err) {
+            console.error("Firebase audio upload failed, trying local save:", err);
+            alert("فشل رفع التسجيل للسحابة. سيتم حفظ نسخة محلية مؤقتًا.");
+        }
+    }
+
+    if (!dirHandle) {
+        try {
+            dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        } catch {
+            downloadAudio(audioBlob, id);
+            return;
+        }
+    }
+    await saveToDirectory(audioBlob, `${id}.webm`, true);
+}
+
+async function saveToDirectory(blob, fileName, inAudioFolder = false) {
     try {
-        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        let targetHandle = dirHandle;
+        if (inAudioFolder) {
+            targetHandle = await dirHandle.getDirectoryHandle('audio', { create: true });
+        }
+
+        const fileHandle = await targetHandle.getFileHandle(fileName, { create: true });
         const writable = await fileHandle.createWritable();
         await writable.write(blob);
         await writable.close();
-        console.log(`Saved successfully to folder: ${fileName}`);
+        console.log(`Saved successfully to folder: ${inAudioFolder ? `audio/${fileName}` : fileName}`);
     } catch (err) {
         console.error("Direct save failed, falling back to download:", err);
         downloadAudio(blob, fileName.replace('.webm', ''));
@@ -316,22 +426,36 @@ function downloadAudio(blob, id) {
 }
 
 // --- Student Mode: Playback Logic ---
-function playAudio(id) {
-    // Add a timestamp to the URL to force the browser to bypass cache and play the NEW recording
-    const audioPath = `./audio/${id}.webm?t=${new Date().getTime()}`;
-    const audio = new Audio(audioPath);
+async function playAudio(id) {
     const card = document.getElementById(id);
-    
     card.classList.add('playing');
-    
-    audio.play().catch(err => {
-        console.warn(`Audio file not found: ${audioPath}`);
+
+    let audioPath = `./audio/${id}.webm?t=${new Date().getTime()}`;
+
+    if (firebaseStorage) {
+        try {
+            const storageRef = ref(firebaseStorage, `audio/${id}.webm`);
+            audioPath = await getDownloadURL(storageRef);
+        } catch (err) {
+            console.warn(`Cloud audio not found, using local fallback for ${id}.`, err);
+        }
+    }
+
+    const audio = new Audio(audioPath);
+
+    audio.play().catch(() => {
         card.style.borderColor = '#e74c3c';
-        setTimeout(() => card.style.borderColor = 'transparent', 500);
+        setTimeout(() => {
+            card.style.borderColor = 'transparent';
+        }, 500);
         card.classList.remove('playing');
     });
 
     audio.onended = () => {
+        card.classList.remove('playing');
+    };
+
+    audio.onerror = () => {
         card.classList.remove('playing');
     };
 }
