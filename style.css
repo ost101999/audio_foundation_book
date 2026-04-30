@@ -231,6 +231,14 @@ body.teacher-mode .add-btn.teacher-only {
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--primary-color);
+    -moz-appearance: textfield; /* Hide spinners in Firefox */
+}
+
+/* Hide spinners in Chrome, Safari, Edge */
+#pageInput::-webkit-outer-spin-button,
+#pageInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 #pageInput:focus {
