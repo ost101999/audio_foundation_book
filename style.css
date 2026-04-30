@@ -323,28 +323,29 @@ body.teacher-mode .add-btn.teacher-only {
     }
 
     body {
-        display: grid;
-        grid-template-rows: auto minmax(0, 1fr) auto;
+        display: flex;
+        flex-direction: column;
         height: 100dvh;
         max-height: 100dvh;
         overflow: hidden;
     }
 
     .main-header {
-        grid-row: 1;
+        flex: 0 0 auto;
         position: relative;
     }
 
     .content {
-        grid-row: 2;
+        flex: 1 1 0%;
         display: flex;
         min-height: 0;
         max-height: 100%;
         align-self: stretch;
+        overflow: hidden;
     }
 
     .pagination-bar {
-        grid-row: 3;
+        flex: 0 0 auto;
         position: relative;
         z-index: 200;
         align-self: stretch;
@@ -411,9 +412,10 @@ body.teacher-mode .add-btn.teacher-only {
     */
     .words-grid {
         --mobile-pad: calc(2 * var(--mobile-side, 14px));
+        /* الحساب بناءً على المساحة المتبقية الفورية */
         width: min(
             calc(100vw - var(--mobile-pad)),
-            calc(100dvh - var(--chrome, 152px)),
+            calc(100cqh - 10px),
             100%
         );
         max-width: 100%;
@@ -455,13 +457,11 @@ body.teacher-mode .add-btn.teacher-only {
     .pagination-bar .container {
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
+        flex-wrap: wrap; /* السماح بالالتفاف في وضع المعلم */
         align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        row-gap: 10px;
+        justify-content: center; /* توسيط العناصر */
+        gap: 12px;
         width: 100%;
-        min-height: 52px;
     }
 
     .add-btn {
