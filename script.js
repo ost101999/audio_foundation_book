@@ -50,6 +50,7 @@ const FIRESTORE_COLLECTION = "books";
 const FIRESTORE_DOC_ID = "reading-app";
 
 const firebaseConfig = window.FIREBASE_CONFIG || {};
+const useFirebaseStorage = window.USE_FIREBASE_STORAGE === true;
 const hasFirebaseConfig = Boolean(firebaseConfig.apiKey) &&
     !String(firebaseConfig.apiKey).includes("PUT_YOUR_");
 
@@ -61,7 +62,9 @@ let stopRealtimeSync = null;
 if (hasFirebaseConfig) {
     const firebaseApp = initializeApp(firebaseConfig);
     firebaseDb = getFirestore(firebaseApp);
-    firebaseStorage = getStorage(firebaseApp);
+    if (useFirebaseStorage) {
+        firebaseStorage = getStorage(firebaseApp);
+    }
     bookDocRef = doc(firebaseDb, FIRESTORE_COLLECTION, FIRESTORE_DOC_ID);
 } else {
     console.warn("Firebase config is missing. App is running with local data only.");
@@ -338,6 +341,15 @@ async function handleCardClick(id) {
 // --- Teacher Mode: Recording Logic ---
 async function startRecording(id) {
     try {
+        if (!firebaseStorage && !dirHandle) {
+            try {
+                dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            } catch {
+                alert("لازم تختار فولدر المشروع علشان نحفظ الصوت داخل audio.");
+                return;
+            }
+        }
+
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
         mediaRecorder = new MediaRecorder(stream);
         audioChunks = [];

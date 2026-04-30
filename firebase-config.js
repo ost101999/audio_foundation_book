@@ -7,3 +7,6 @@ window.FIREBASE_CONFIG = {
   appId: "1:132959327913:web:c92564d98fc635a73abbb8",
   measurementId: "G-07PXFNVPYV"
 };
+
+// حاليا خلّيه false لأننا شغالين بـ workflow رفع يدوي للصوت.
+window.USE_FIREBASE_STORAGE = false;
