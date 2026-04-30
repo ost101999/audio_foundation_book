@@ -1,5 +1,5 @@
-// Data Structure: Multi-page support
-const bookData = {
+// Initial Data Structure
+const defaultData = {
     "الحروف بالفتح": [
         { id: "p1_w1", text: "أَ" }, { id: "p1_w2", text: "بَ" },
         { id: "p1_w3", text: "تَ" }, { id: "p1_w4", text: "ثَ" },
@@ -19,18 +19,11 @@ const bookData = {
         { id: "p2_w11", text: "زِ" }, { id: "p2_w12", text: "سِ" },
         { id: "p2_w13", text: "شِ" }, { id: "p2_w14", text: "صِ" },
         { id: "p2_w15", text: "ضِ" }, { id: "p2_w16", text: "طِ" }
-    ],
-    "الحروف بالضم": [
-        { id: "p3_w1", text: "أُ" }, { id: "p3_w2", text: "بُ" },
-        { id: "p3_w3", text: "تُ" }, { id: "p3_w4", text: "ثُ" },
-        { id: "p3_w5", text: "جُ" }, { id: "p3_w6", text: "حُ" },
-        { id: "p3_w7", text: "خُ" }, { id: "p3_w8", text: "دُ" },
-        { id: "p3_w9", text: "ذُ" }, { id: "p3_w10", text: "رُ" },
-        { id: "p3_w11", text: "زُ" }, { id: "p3_w12", text: "سُ" },
-        { id: "p3_w13", text: "شُ" }, { id: "p3_w14", text: "صُ" },
-        { id: "p3_w15", text: "ضُ" }, { id: "p3_w16", text: "طُ" }
     ]
 };
+
+// Load data from localStorage or use default
+let bookData = JSON.parse(localStorage.getItem('readingAppData')) || defaultData;
 
 // State Management
 let currentPage = Object.keys(bookData)[0];
@@ -50,6 +43,11 @@ function init() {
     renderTabs();
     renderCards();
     setupEventListeners();
+}
+
+// Save data to localStorage
+function saveData() {
+    localStorage.setItem('readingAppData', JSON.stringify(bookData));
 }
 
 // Render Page Navigation Tabs
@@ -77,11 +75,32 @@ function renderCards() {
         card.className = 'word-card';
         card.id = word.id;
         card.textContent = word.text;
+        
+        // Left click for Recording/Playback
         card.addEventListener('click', () => handleCardClick(word.id));
+        
+        // Right click to EDIT word
+        card.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            editWord(word.id);
+        });
+
         wordsGrid.appendChild(card);
     });
 }
 
+function editWord(id) {
+    const words = bookData[currentPage];
+    const wordIndex = words.findIndex(w => w.id === id);
+    if (wordIndex === -1) return;
+
+    const newText = prompt("أدخل النص الجديد للكلمة:", words[wordIndex].text);
+    if (newText !== null && newText.trim() !== "") {
+        words[wordIndex].text = newText.trim();
+        saveData();
+        renderCards();
+    }
+}
 // Handle Mode Change
 function setupEventListeners() {
     modeToggle.addEventListener('change', (e) => {
