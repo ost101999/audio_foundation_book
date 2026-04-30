@@ -188,6 +188,7 @@ input:checked + .slider:before {
     gap: 10px;
     font-weight: 700;
     color: #4a5568;
+    font-family: 'Acme', sans-serif; /* English Numbers Font */
 }
 
 #pageInput {
@@ -196,8 +197,8 @@ input:checked + .slider:before {
     border: 2px solid #e2e8f0;
     border-radius: 10px;
     text-align: center;
-    font-family: var(--font-ui);
-    font-size: 1.1rem;
+    font-family: 'Acme', sans-serif;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--primary-color);
 }
@@ -207,13 +208,37 @@ input:checked + .slider:before {
     outline: none;
 }
 
+.add-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px dashed var(--primary-color);
+    background: white;
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: var(--transition);
+    position: absolute;
+    right: 20px;
+}
+
+.add-btn:hover {
+    background: var(--primary-color);
+    color: white;
+    border-style: solid;
+}
+
 /* Main Content */
 .content {
     flex: 1;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 10px;
+    padding: 15px;
+    min-height: 0; /* Important for flex child scaling */
 }
 
 .words-grid {
@@ -222,9 +247,9 @@ input:checked + .slider:before {
     grid-template-rows: repeat(4, 1fr);
     gap: 12px;
     width: 100%;
-    max-width: 600px;
-    aspect-ratio: 1 / 1.1; /* Maintain balanced shape */
-    margin: 0 auto;
+    max-width: 500px; /* Reduced for better mobile fit */
+    aspect-ratio: 1 / 1;
+    margin: auto;
 }
 
 /* Cards */
@@ -264,61 +289,44 @@ input:checked + .slider:before {
 }
 
 /* Mobile Specific */
-@media (max-width: 480px) {
-    h1 { font-size: 1rem; }
+@media (max-width: 600px) {
+    .main-header h1 { font-size: 1.1rem; }
+    
+    .content {
+        padding: 5px;
+    }
+
     .words-grid {
         gap: 8px;
-        aspect-ratio: auto;
-        height: calc(100vh - 120px);
+        max-width: 95vw;
+        max-height: 65vh; /* Keep it compact */
+        aspect-ratio: 1 / 1;
     }
+    
     .word-card {
         border-radius: 8px;
-        font-size: 1.8rem;
+        font-size: clamp(1.5rem, 5vh, 2.2rem);
+        padding: 5px;
     }
-}
 
-.word-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-}
-
-.word-card:active {
-    transform: scale(0.95);
-}
-
-/* Mode Specific Styles */
-body.teacher-mode .word-card:hover {
-    border-color: var(--danger-color);
-}
-
-.word-card.recording {
-    background-color: #fff5f5;
-    border-color: var(--danger-color);
-    animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0.4); }
-    70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(231, 76, 60, 0); }
-    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(231, 76, 60, 0); }
-}
-
-/* Footer */
-.main-footer {
-    padding: 20px;
-    text-align: center;
-    color: #95a5a6;
-    font-size: 0.8rem;
-}
-
-/* Responsive */
-@media (max-width: 600px) {
-    .words-grid {
-        gap: 10px;
+    .pagination-bar .container {
+        gap: 15px;
     }
-    .word-card {
-        height: 100px;
-        font-size: 2.5rem;
-        border-radius: 15px;
+
+    .pag-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 1rem;
+    }
+    
+    #pageInput {
+        width: 50px;
+        font-size: 1rem;
+    }
+
+    .add-btn {
+        position: static;
+        width: 35px;
+        height: 35px;
     }
 }
