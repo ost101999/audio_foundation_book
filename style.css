@@ -67,7 +67,7 @@ h1 {
 .mode-switcher {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 20px;
     background: #f0f3f6;
     padding: 4px 12px;
     border-radius: 20px;
@@ -121,7 +121,7 @@ input:checked + .slider {
 }
 
 input:checked + .slider:before {
-    transform: translateX(-20px); 
+    transform: translateX(20px); /* Moves RIGHT in RTL */
 }
 
 .slider.round {

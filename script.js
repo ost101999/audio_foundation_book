@@ -15,6 +15,7 @@ let isTeacherMode = false;
 let mediaRecorder = null;
 let audioChunks = [];
 let currentlyRecordingId = null;
+let dirHandle = null; // To store the directory handle for direct saving
 
 // DOM Elements
 const wordsGrid = document.getElementById('wordsGrid');
@@ -55,6 +56,15 @@ function setupEventListeners() {
 // Main Interaction Logic
 async function handleCardClick(id) {
     if (isTeacherMode) {
+        // If folder handle is not set, request it on first click
+        if (!dirHandle) {
+            try {
+                dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            } catch (err) {
+                console.warn("User cancelled directory picker. Falling back to normal downloads.");
+            }
+        }
+
         if (currentlyRecordingId === id) {
             stopRecording();
         } else {
@@ -77,9 +87,15 @@ async function startRecording(id) {
             audioChunks.push(event.data);
         };
 
-        mediaRecorder.onstop = () => {
+        mediaRecorder.onstop = async () => {
             const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-            downloadAudio(audioBlob, id);
+            
+            if (dirHandle) {
+                await saveToDirectory(audioBlob, `${id}.webm`);
+            } else {
+                downloadAudio(audioBlob, id);
+            }
+            
             stream.getTracks().forEach(track => track.stop());
         };
 
@@ -90,6 +106,19 @@ async function startRecording(id) {
     } catch (err) {
         console.error("Microphone access denied:", err);
         alert("يرجى السماح بالوصول للميكروفون للتسجيل.");
+    }
+}
+
+async function saveToDirectory(blob, fileName) {
+    try {
+        const fileHandle = await dirHandle.getFileHandle(fileName, { create: true });
+        const writable = await fileHandle.createWritable();
+        await writable.write(blob);
+        await writable.close();
+        console.log(`Saved successfully to folder: ${fileName}`);
+    } catch (err) {
+        console.error("Direct save failed, falling back to download:", err);
+        downloadAudio(blob, fileName.replace('.webm', ''));
     }
 }
 
@@ -114,11 +143,11 @@ function downloadAudio(blob, id) {
 
 // --- Student Mode: Playback Logic ---
 function playAudio(id) {
-    const audioPath = `./audio/${id}.webm`;
+    // Add a timestamp to the URL to force the browser to bypass cache and play the NEW recording
+    const audioPath = `./audio/${id}.webm?t=${new Date().getTime()}`;
     const audio = new Audio(audioPath);
     const card = document.getElementById(id);
     
-    // Visual feedback: adding 'playing' class
     card.classList.add('playing');
     
     audio.play().catch(err => {
