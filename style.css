@@ -27,7 +27,7 @@ body {
 }
 
 .container {
-    max-width: 1400px; /* Scaled to 175% of original 800px */
+    max-width: 800px;
     margin: 0 auto;
     padding: 0 20px;
     width: 100%;
@@ -231,6 +231,14 @@ body.teacher-mode .add-btn.teacher-only {
     font-size: 1.3rem;
     font-weight: 700;
     color: var(--primary-color);
+    -moz-appearance: textfield; /* Hide spinners in Firefox */
+}
+
+/* Hide spinners in Chrome, Safari, Edge */
+#pageInput::-webkit-outer-spin-button,
+#pageInput::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 #pageInput:focus {
@@ -283,18 +291,35 @@ body.teacher-mode .add-btn.teacher-only {
     min-height: 0;
 }
 
-@media (min-width: 601px) {
+@media (min-width: 480px) {
     body {
-        padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+        padding-bottom: 0; /* Let flex handle it */
+    }
+
+    .container {
+        max-width: none;
+        width: 100%;
+    }
+
+    .reading-stack {
+        zoom: 1.75;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        margin: auto;
     }
 
     .pagination-bar {
-        position: fixed;
-        inset-inline: 0;
-        bottom: 0;
-        isolation: isolate;
-        z-index: 100;
+        position: static; /* Move it with the zoomed content */
+        width: 100%;
+        margin-top: 20px;
+        background: transparent;
+        box-shadow: none;
     }
+
 
     /* Reverse arrows only on desktop */
     .pagination-inner {
@@ -302,16 +327,16 @@ body.teacher-mode .add-btn.teacher-only {
     }
 
     .words-grid {
-        max-width: 875px; /* Scaled to 175% of original 500px */
-        gap: 20px;
+        max-width: 500px;
+        gap: 12px;
     }
 
     .word-card {
-        font-size: 6rem; /* Increased for better visibility at 175% scale */
+        /* font-size will be scaled by zoom */
     }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 479px) {
     .reading-stack {
         justify-content: flex-start;
     }
@@ -366,7 +391,7 @@ body.teacher-mode .add-btn.teacher-only {
 }
 
 /* ——— عرض مخصص للهاتف ——— */
-@media (max-width: 600px) {
+@media (max-width: 479px) {
     html {
         overflow: hidden;
         height: 100%;
