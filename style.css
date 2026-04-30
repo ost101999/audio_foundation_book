@@ -158,8 +158,12 @@ body.teacher-mode .add-btn.teacher-only {
     isolation: isolate;
 }
 
-.pagination-bar .container {
+.pagination-inner {
     position: relative;
+    max-width: 800px;
+    margin-inline: auto;
+    padding-inline: 20px;
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -267,6 +271,36 @@ body.teacher-mode .add-btn.teacher-only {
     min-height: 0; /* Important for flex child scaling */
 }
 
+.reading-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+}
+
+@media (min-width: 601px) {
+    body {
+        padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px));
+    }
+
+    .pagination-bar {
+        position: fixed;
+        inset-inline: 0;
+        bottom: 0;
+        isolation: isolate;
+        z-index: 100;
+    }
+}
+
+@media (max-width: 600px) {
+    .reading-stack {
+        justify-content: flex-start;
+    }
+}
+
 .words-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
@@ -324,10 +358,11 @@ body.teacher-mode .add-btn.teacher-only {
 
     body {
         display: grid;
-        grid-template-rows: auto minmax(0, 1fr) auto;
+        grid-template-rows: auto minmax(0, 1fr);
         height: 100dvh;
         max-height: 100dvh;
         overflow: hidden;
+        padding-bottom: 0;
     }
 
     .main-header {
@@ -340,13 +375,6 @@ body.teacher-mode .add-btn.teacher-only {
         display: flex;
         min-height: 0;
         max-height: 100%;
-        align-self: stretch;
-    }
-
-    .pagination-bar {
-        grid-row: 3;
-        position: relative;
-        z-index: 200;
         align-self: stretch;
     }
 
@@ -413,7 +441,7 @@ body.teacher-mode .add-btn.teacher-only {
         --mobile-pad: calc(2 * var(--mobile-side, 14px));
         width: min(
             calc(100vw - var(--mobile-pad)),
-            calc(100dvh - var(--chrome, 152px)),
+            calc(100dvh - var(--chrome, 128px)),
             100%
         );
         max-width: 100%;
@@ -446,22 +474,34 @@ body.teacher-mode .add-btn.teacher-only {
         padding: 2px;
     }
 
+    /* تصفّح تحت شبكة الكلمات — بدون شريط سفلي كامل */
     .pagination-bar {
-        padding-block: 10px;
-        padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+        position: static;
+        background: transparent;
+        backdrop-filter: none;
+        box-shadow: none;
+        padding: 0;
+        margin-top: clamp(8px, 2.5vmin, 14px);
+        margin-bottom: max(10px, env(safe-area-inset-bottom, 0px));
+        flex-shrink: 0;
+        width: 100%;
+        isolation: auto;
+        z-index: auto;
     }
 
-    /* flex أوضح من grid عندما زر الإضافة display:none ويتجنب صفًا بارتفاع صفر */
-    .pagination-bar .container {
+    .pagination-inner {
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
         align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        row-gap: 10px;
+        justify-content: center;
+        gap: 10px 16px;
+        row-gap: 8px;
         width: 100%;
-        min-height: 52px;
+        max-width: 100%;
+        min-height: unset;
+        padding-inline: 0;
+        direction: ltr;
     }
 
     .add-btn {
@@ -469,14 +509,17 @@ body.teacher-mode .add-btn.teacher-only {
         flex: 0 0 auto;
         position: static;
         transform: none;
-        width: 40px;
-        height: 40px;
-        font-size: 1.35rem;
+        width: 36px;
+        height: 36px;
+        font-size: 1.2rem;
+        border-width: 1px;
+        opacity: 0.92;
     }
 
     body.teacher-mode .add-btn {
         flex-basis: 100%;
         align-self: center;
+        margin-bottom: 2px;
     }
 
     #prevPage,
@@ -485,46 +528,72 @@ body.teacher-mode .add-btn.teacher-only {
     }
 
     .page-info {
-        flex: 1 1 auto;
+        flex: 0 1 auto;
         min-width: 0;
-        gap: 6px;
-        padding: 10px 12px;
-        background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
-        border: 1px solid #dce3ec;
-        border-radius: 14px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-        font-size: 0.85rem;
-        min-height: 48px;
+        gap: 5px;
+        padding: 0;
+        margin: 0;
+        background: none;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+        font-size: 0.72rem;
+        font-weight: 500;
+        min-height: unset;
+        color: #94a3b8;
+        letter-spacing: 0.02em;
     }
 
     .page-info-label {
-        color: #475569;
+        color: inherit;
+        font-weight: 500;
+        font-size: inherit;
+        opacity: 0.88;
     }
 
     .page-info #totalPages {
-        font-weight: 700;
-        color: var(--primary-color);
-    }
-
-    /* ترتيب مرئي ثابت LTR: prev | معلومات | next حتى مع dir=rtl على الصفحة */
-    .pagination-bar .container {
-        direction: ltr;
+        font-weight: 600;
+        color: inherit;
+        opacity: 1;
     }
 
     .pag-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 1.05rem;
+        width: 40px;
+        height: 40px;
+        font-size: 0.98rem;
         flex-shrink: 0;
+        background: #e8eef6;
+        color: var(--primary-color);
+        box-shadow: none;
+        border: 1px solid #dfe7f3;
+    }
+
+    .pag-btn:hover:not(:disabled) {
+        transform: none;
+        background: #dfe8f4;
+        color: #357abd;
+    }
+
+    .pag-btn:disabled {
+        background: #eef1f6;
+        color: #b8c5d9;
+        border-color: #e8ecf2;
     }
 
     #pageInput {
-        width: 3.25rem;
-        min-height: 40px;
-        padding: 6px 4px;
-        font-size: 1.05rem;
-        border-radius: 10px;
-        border-width: 1px;
+        width: 2.5rem;
+        min-height: 32px;
+        padding: 3px 2px;
+        font-size: 0.92rem;
+        border-radius: 8px;
+        border: 1px solid #dfe7f3;
+        background: #fafbfd;
+        color: var(--text-color);
+        font-weight: 600;
+    }
+
+    #pageInput:focus {
+        border-color: #c9d8ec;
         background: #fff;
     }
 }
