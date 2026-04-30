@@ -325,8 +325,8 @@ body.teacher-mode .add-btn.teacher-only {
     body {
         display: flex;
         flex-direction: column;
-        height: 100dvh;
-        max-height: 100dvh;
+        height: 100%; /* الاعتماد على ارتفاع html المستقر */
+        max-height: -webkit-fill-available;
         overflow: hidden;
     }
 
@@ -349,13 +349,17 @@ body.teacher-mode .add-btn.teacher-only {
         position: relative;
         z-index: 200;
         align-self: stretch;
+        padding-block: 12px;
+        padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
+        background: #ffffff;
+        border-top: 1px solid #e2e8f0;
+        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
     }
 
     .main-footer {
         display: none;
     }
 
-    /* هوامش يمين وشمال للمحتوى */
     .container {
         --mobile-side: 14px;
         padding-inline: var(--mobile-side);
@@ -381,7 +385,6 @@ body.teacher-mode .add-btn.teacher-only {
         max-width: 100%;
     }
 
-    /* إخفاء وضع المعلم / الطالب على الهاتف */
     .mode-controls {
         display: none !important;
     }
@@ -407,12 +410,8 @@ body.teacher-mode .add-btn.teacher-only {
         max-height: 100%;
     }
 
-    /*
-      مربع الشبكة يملأ المساحة المتاحة بدون تمرير (مع استعلام الحاوية + احتياطي).
-    */
     .words-grid {
         --mobile-pad: calc(2 * var(--mobile-side, 14px));
-        /* الحساب بناءً على المساحة المتبقية الفورية */
         width: min(
             calc(100vw - var(--mobile-pad)),
             calc(100cqh - 10px),
@@ -448,20 +447,16 @@ body.teacher-mode .add-btn.teacher-only {
         padding: 2px;
     }
 
-    .pagination-bar {
-        padding-block: 10px;
-        padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
-    }
-
     /* flex أوضح من grid عندما زر الإضافة display:none ويتجنب صفًا بارتفاع صفر */
     .pagination-bar .container {
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap; /* السماح بالالتفاف في وضع المعلم */
+        flex-wrap: nowrap; /* العودة لمنع الالتفاف لضمان الثبات */
         align-items: center;
-        justify-content: center; /* توسيط العناصر */
-        gap: 12px;
+        justify-content: space-between;
+        gap: 10px;
         width: 100%;
+        max-width: 100%;
     }
 
     .add-btn {
@@ -487,14 +482,14 @@ body.teacher-mode .add-btn.teacher-only {
     .page-info {
         flex: 1 1 auto;
         min-width: 0;
-        gap: 6px;
-        padding: 10px 12px;
-        background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
-        border: 1px solid #dce3ec;
-        border-radius: 14px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-        font-size: 0.85rem;
-        min-height: 48px;
+        gap: 4px;
+        padding: 8px 10px;
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        min-height: 44px;
+        white-space: nowrap;
     }
 
     .page-info-label {
