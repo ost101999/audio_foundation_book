@@ -391,7 +391,7 @@ body.teacher-mode .add-btn.teacher-only {
         align-items: center;
         justify-content: center;
         min-height: 0;
-        overflow: auto; /* allow scrolling so pagination remains visible */
+        overflow: hidden;
     }
 
     .content .container {
@@ -417,17 +417,16 @@ body.teacher-mode .add-btn.teacher-only {
             100%
         );
         max-width: 100%;
-        max-height: calc(100dvh - 160px); /* leave space for header + pagination */
+        max-height: 100%;
         min-height: 0;
         min-width: 0;
-        aspect-ratio: auto;
+        aspect-ratio: 1;
         height: auto;
         margin-inline: auto;
         gap: clamp(6px, 1.8vmin, 10px);
         box-sizing: border-box;
         align-self: center;
         flex-shrink: 1;
-        overflow: auto;
     }
 
     @container wordarea (min-width: 0px) {
