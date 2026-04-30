@@ -5,8 +5,8 @@
     --bg-color: #f8faff;
     --card-bg: #ffffff;
     --text-color: #2c3e50;
-    --font-ui: 'Tajawal', sans-serif;
-    --font-word: 'Amiri', serif;
+    --font-ui: 'Sakkal Majalla', 'Tajawal', sans-serif;
+    --font-word: 'Sakkal Majalla', 'Amiri', serif;
     --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
 }
