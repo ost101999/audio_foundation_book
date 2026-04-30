@@ -27,7 +27,7 @@ body {
 }
 
 .container {
-    max-width: 800px;
+    max-width: 1400px; /* Scaled to 175% of original 800px */
     margin: 0 auto;
     padding: 0 20px;
     width: 100%;
@@ -221,12 +221,14 @@ body.teacher-mode .add-btn.teacher-only {
 }
 
 #pageInput {
-    width: 60px;
-    padding: 8px;
+    width: 65px;
+    height: 45px;
+    padding: 0;
+    line-height: 45px;
     border: 2px solid #e2e8f0;
     border-radius: 10px;
     text-align: center;
-    font-size: 1.2rem;
+    font-size: 1.3rem;
     font-weight: 700;
     color: var(--primary-color);
 }
@@ -292,6 +294,20 @@ body.teacher-mode .add-btn.teacher-only {
         bottom: 0;
         isolation: isolate;
         z-index: 100;
+    }
+
+    /* Reverse arrows only on desktop */
+    .pagination-inner {
+        flex-direction: row-reverse;
+    }
+
+    .words-grid {
+        max-width: 875px; /* Scaled to 175% of original 500px */
+        gap: 20px;
+    }
+
+    .word-card {
+        font-size: 6rem; /* Increased for better visibility at 175% scale */
     }
 }
 
