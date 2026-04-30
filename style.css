@@ -292,9 +292,6 @@ body.teacher-mode .add-btn.teacher-only {
 }
 
 @media (min-width: 480px) {
-    body {
-        padding-bottom: 0; /* Let flex handle it */
-    }
 
     .container {
         max-width: none;
@@ -313,11 +310,19 @@ body.teacher-mode .add-btn.teacher-only {
     }
 
     .pagination-bar {
-        position: static; /* Move it with the zoomed content */
-        width: 100%;
-        margin-top: 20px;
+        position: fixed;
+        inset-inline: 0;
+        bottom: 30px; /* Raised slightly from the bottom */
+        z-index: 100;
         background: transparent;
+        backdrop-filter: none;
+        padding: 0;
         box-shadow: none;
+        margin-top: 0;
+    }
+
+    body {
+        padding-bottom: 120px; /* Space for zoomed fixed bar */
     }
 
 
