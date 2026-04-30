@@ -28,13 +28,52 @@ const defaultData = [
     }
 ];
 
-// Load data from localStorage or use default
-let storedData = JSON.parse(localStorage.getItem('readingAppData'));
-// Check if stored data is the OLD object format or missing, then reset to new Array format
-let bookData = (Array.isArray(storedData)) ? storedData : defaultData;
+/** نسخة الكتاب المشتركة مع كل من يفتح الموقع (ملف JSON بجانب index.html على الخادم) */
+const BOOK_JSON_FILE = 'readingAppData.json';
 
-if (!Array.isArray(storedData)) {
+let bookData;
+
+async function loadBookData() {
+    try {
+        const res = await fetch(BOOK_JSON_FILE, { cache: 'no-store' });
+        if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data) && data.length > 0) {
+                return data;
+            }
+        }
+    } catch (_) {
+        /* file:// أو لا يوجد ملف على الخادم */
+    }
+    try {
+        const stored = JSON.parse(localStorage.getItem('readingAppData'));
+        if (Array.isArray(stored)) return stored;
+    } catch (_) {}
+    return defaultData;
+}
+
+function saveData() {
     localStorage.setItem('readingAppData', JSON.stringify(bookData));
+    persistBookJsonIfTeacher();
+}
+
+async function persistBookJsonIfTeacher() {
+    if (!isTeacherMode) return;
+    try {
+        if (!dirHandle) {
+            try {
+                dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
+            } catch {
+                return;
+            }
+        }
+        const blob = new Blob([JSON.stringify(bookData, null, 2)], {
+            type: 'application/json;charset=utf-8'
+        });
+        await saveToDirectory(blob, BOOK_JSON_FILE);
+    } catch (err) {
+        console.warn('Could not save shared book JSON:', err);
+    }
 }
 
 // State Management
@@ -55,15 +94,17 @@ const nextPageBtn = document.getElementById('nextPage');
 const addPageBtn = document.getElementById('addPageBtn');
 
 // Initialize App
-function init() {
+async function init() {
+    bookData = await loadBookData();
+    if (!Array.isArray(bookData) || bookData.length === 0) {
+        bookData = JSON.parse(JSON.stringify(defaultData));
+    }
+    currentPageIndex = Math.min(currentPageIndex, bookData.length - 1);
+    currentPageIndex = Math.max(0, currentPageIndex);
+    localStorage.setItem('readingAppData', JSON.stringify(bookData));
     renderPagination();
     renderCards();
     setupEventListeners();
-}
-
-// Save data to localStorage
-function saveData() {
-    localStorage.setItem('readingAppData', JSON.stringify(bookData));
 }
 
 // Update Pagination UI
@@ -132,6 +173,15 @@ function setupEventListeners() {
             renderCards();
         }
     });
+
+    const selectPageInputAll = () => {
+        requestAnimationFrame(() => {
+            pageInput.select();
+        });
+    };
+
+    pageInput.addEventListener('focus', selectPageInputAll);
+    pageInput.addEventListener('click', selectPageInputAll);
 
     pageInput.addEventListener('change', (e) => {
         let val = parseInt(e.target.value);
@@ -271,5 +321,4 @@ function playAudio(id) {
     };
 }
 
-// Start the app
-init();
+init().catch((err) => console.error(err));

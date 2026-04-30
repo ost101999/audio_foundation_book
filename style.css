@@ -195,6 +195,7 @@ body.teacher-mode .add-btn.teacher-only {
 }
 
 .page-info {
+    direction: ltr;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -202,7 +203,17 @@ body.teacher-mode .add-btn.teacher-only {
     gap: 10px;
     font-weight: 700;
     color: #4a5568;
-    font-family: 'Acme', sans-serif; /* English Numbers Font */
+}
+
+.page-info-label {
+    font-family: 'Tajawal', sans-serif;
+    font-weight: 600;
+}
+
+#pageInput,
+.page-info #totalPages {
+    font-family: 'Acme', sans-serif;
+    font-variant-numeric: lining-nums;
 }
 
 #pageInput {
@@ -211,7 +222,6 @@ body.teacher-mode .add-btn.teacher-only {
     border: 2px solid #e2e8f0;
     border-radius: 10px;
     text-align: center;
-    font-family: 'Acme', sans-serif;
     font-size: 1.2rem;
     font-weight: 700;
     color: var(--primary-color);
@@ -308,23 +318,59 @@ body.teacher-mode .add-btn.teacher-only {
 /* ——— عرض مخصص للهاتف ——— */
 @media (max-width: 600px) {
     html {
-        overflow-x: hidden;
+        overflow: hidden;
+        height: 100%;
     }
 
+    body {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        height: 100dvh;
+        max-height: 100dvh;
+        overflow: hidden;
+    }
+
+    .main-header {
+        grid-row: 1;
+        position: relative;
+    }
+
+    .content {
+        grid-row: 2;
+        display: flex;
+        min-height: 0;
+        max-height: 100%;
+        align-self: stretch;
+    }
+
+    .pagination-bar {
+        grid-row: 3;
+        position: relative;
+        z-index: 200;
+        align-self: stretch;
+    }
+
+    .main-footer {
+        display: none;
+    }
+
+    /* هوامش يمين وشمال للمحتوى */
     .container {
-        padding-inline: 12px;
+        --mobile-side: 14px;
+        padding-inline: var(--mobile-side);
         max-width: 100%;
     }
 
     .main-header {
-        padding-block: 10px;
+        padding-block: 8px;
     }
 
     .main-header .container {
-        flex-direction: column;
+        flex-direction: row;
+        justify-content: center;
         align-items: center;
         text-align: center;
-        gap: 10px;
+        gap: 0;
     }
 
     .main-header h1 {
@@ -334,54 +380,64 @@ body.teacher-mode .add-btn.teacher-only {
         max-width: 100%;
     }
 
+    /* إخفاء وضع المعلم / الطالب على الهاتف */
     .mode-controls {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .mode-switcher {
-        width: 100%;
-        max-width: min(100%, 360px);
-        justify-content: center;
-        gap: 12px;
-        padding: 6px 10px;
-    }
-
-    .mode-label {
-        font-size: 0.7rem;
+        display: none !important;
     }
 
     .content {
-        padding: 8px 0;
+        padding-block: 6px;
+        padding-inline: 0;
         align-items: center;
         justify-content: center;
+        min-height: 0;
+        overflow: hidden;
     }
 
     .content .container {
+        container-type: size;
+        container-name: wordarea;
         display: flex;
         justify-content: center;
         align-items: center;
         width: 100%;
+        height: 100%;
+        min-height: 0;
+        max-height: 100%;
     }
 
     /*
-      مربع الشبكة: ضلع = أصغر قيمة بين (عرض الشاشة − هامش) و(ارتفاع الشاشة − شريط التصفح والرأس)
-      لتفادي 95vw مع padding الحاوية (تمرير أفقي وانزياح بصري في RTL).
+      مربع الشبكة يملأ المساحة المتاحة بدون تمرير (مع استعلام الحاوية + احتياطي).
     */
     .words-grid {
-        --mobile-pad: 24px;
-        --chrome: 200px;
+        --mobile-pad: calc(2 * var(--mobile-side, 14px));
         width: min(
             calc(100vw - var(--mobile-pad)),
-            calc(100dvh - var(--chrome)),
+            calc(100dvh - var(--chrome, 152px)),
             100%
         );
         max-width: 100%;
+        max-height: 100%;
+        min-height: 0;
+        min-width: 0;
         aspect-ratio: 1;
         height: auto;
         margin-inline: auto;
         gap: clamp(6px, 1.8vmin, 10px);
         box-sizing: border-box;
+        align-self: center;
+        flex-shrink: 1;
+    }
+
+    @container wordarea (min-width: 0px) {
+        .words-grid {
+            width: min(100cqw, 100cqh);
+            max-width: 100%;
+            max-height: 100%;
+            min-height: 0;
+            height: auto;
+            aspect-ratio: 1;
+        }
     }
 
     .word-card {
@@ -391,43 +447,48 @@ body.teacher-mode .add-btn.teacher-only {
     }
 
     .pagination-bar {
-        padding-block: 12px;
-        padding-bottom: max(12px, env(safe-area-inset-bottom, 0px));
+        padding-block: 10px;
+        padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
     }
 
-    /* صف للمعلم فوق، ثم سابق | رقم الصفحة | تالي */
+    /* flex أوضح من grid عندما زر الإضافة display:none ويتجنب صفًا بارتفاع صفر */
     .pagination-bar .container {
-        display: grid;
-        grid-template-columns: minmax(44px, 52px) minmax(0, 1fr) minmax(44px, 52px);
-        grid-template-rows: auto auto;
-        column-gap: 10px;
-        row-gap: 12px;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
         align-items: center;
-        justify-items: stretch;
+        justify-content: space-between;
+        gap: 8px;
+        row-gap: 10px;
+        width: 100%;
+        min-height: 52px;
     }
 
     .add-btn {
-        grid-column: 1 / -1;
-        grid-row: 1;
+        order: -1;
+        flex: 0 0 auto;
         position: static;
         transform: none;
-        justify-self: center;
         width: 40px;
         height: 40px;
         font-size: 1.35rem;
     }
 
-    #prevPage {
-        grid-column: 1;
-        grid-row: 2;
-        justify-self: center;
+    body.teacher-mode .add-btn {
+        flex-basis: 100%;
+        align-self: center;
+    }
+
+    #prevPage,
+    #nextPage {
+        flex: 0 0 auto;
     }
 
     .page-info {
-        grid-column: 2;
-        grid-row: 2;
+        flex: 1 1 auto;
+        min-width: 0;
         gap: 6px;
-        padding: 10px 14px;
+        padding: 10px 12px;
         background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
         border: 1px solid #dce3ec;
         border-radius: 14px;
@@ -436,22 +497,18 @@ body.teacher-mode .add-btn.teacher-only {
         min-height: 48px;
     }
 
-    .page-info > span {
+    .page-info-label {
         color: #475569;
-        font-family: var(--font-ui);
-        font-weight: 600;
     }
 
     .page-info #totalPages {
-        font-family: 'Acme', sans-serif;
         font-weight: 700;
         color: var(--primary-color);
     }
 
-    #nextPage {
-        grid-column: 3;
-        grid-row: 2;
-        justify-self: center;
+    /* ترتيب مرئي ثابت LTR: prev | معلومات | next حتى مع dir=rtl على الصفحة */
+    .pagination-bar .container {
+        direction: ltr;
     }
 
     .pag-btn {
@@ -469,10 +526,5 @@ body.teacher-mode .add-btn.teacher-only {
         border-radius: 10px;
         border-width: 1px;
         background: #fff;
-    }
-
-    .main-footer {
-        font-size: 0.75rem;
-        padding-bottom: max(8px, env(safe-area-inset-bottom, 0px));
     }
 }
