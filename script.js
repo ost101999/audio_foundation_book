@@ -29,7 +29,13 @@ const defaultData = [
 ];
 
 // Load data from localStorage or use default
-let bookData = JSON.parse(localStorage.getItem('readingAppData')) || defaultData;
+let storedData = JSON.parse(localStorage.getItem('readingAppData'));
+// Check if stored data is the OLD object format or missing, then reset to new Array format
+let bookData = (Array.isArray(storedData)) ? storedData : defaultData;
+
+if (!Array.isArray(storedData)) {
+    localStorage.setItem('readingAppData', JSON.stringify(bookData));
+}
 
 // State Management
 let currentPageIndex = 0;
