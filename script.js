@@ -133,6 +133,15 @@ function setupEventListeners() {
         }
     });
 
+    const selectPageInputAll = () => {
+        requestAnimationFrame(() => {
+            pageInput.select();
+        });
+    };
+
+    pageInput.addEventListener('focus', selectPageInputAll);
+    pageInput.addEventListener('click', selectPageInputAll);
+
     pageInput.addEventListener('change', (e) => {
         let val = parseInt(e.target.value);
         if (isNaN(val) || val < 1) val = 1;
