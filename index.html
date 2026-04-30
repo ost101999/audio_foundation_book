@@ -7,7 +7,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Tajawal:wght@400;500;700&family=Acme&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=1.4">
+    <link rel="stylesheet" href="style.css?v=1.5">
 </head>
 <body>
     <header class="main-header">
@@ -38,10 +38,10 @@
         <div class="container">
             <button id="addPageBtn" class="add-btn teacher-only" title="إضافة صفحة جديدة">+</button>
             <button id="prevPage" class="pag-btn">▶</button>
-            <div class="page-info">
-                <span>صفحة</span>
-                <input type="number" id="pageInput" min="1" value="1">
-                <span>من <span id="totalPages">1</span></span>
+            <div class="page-info" dir="ltr" lang="en">
+                <span class="page-info-label">Page</span>
+                <input type="number" id="pageInput" lang="en" inputmode="numeric" min="1" value="1">
+                <span class="page-info-label">of <span id="totalPages">1</span></span>
             </div>
             <button id="nextPage" class="pag-btn">◀</button>
         </div>
