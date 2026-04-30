@@ -325,9 +325,10 @@ body.teacher-mode .add-btn.teacher-only {
     body {
         display: flex;
         flex-direction: column;
-        height: 100%; /* الاعتماد على ارتفاع html المستقر */
+        height: 100%;
         max-height: -webkit-fill-available;
         overflow: hidden;
+        justify-content: center; /* يتوسط كل شيء ككتلة واحدة */
     }
 
     .main-header {
@@ -336,24 +337,24 @@ body.teacher-mode .add-btn.teacher-only {
     }
 
     .content {
-        flex: 1 1 0%;
+        flex: 0 0 auto; /* لا يتمدد، بل يأخذ حجم الشبكة فقط */
         display: flex;
+        align-items: center;
+        justify-content: center;
         min-height: 0;
-        max-height: 100%;
-        align-self: stretch;
-        overflow: hidden;
+        padding-block: 5px;
+        overflow: visible; /* للسماح بظهور الظلال */
     }
 
     .pagination-bar {
         flex: 0 0 auto;
-        position: relative;
-        z-index: 200;
-        align-self: stretch;
-        padding-block: 12px;
-        padding-bottom: max(24px, env(safe-area-inset-bottom, 24px));
-        background: #ffffff;
-        border-top: 1px solid #e2e8f0;
-        box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 0;
+        margin-top: 10px; /* المسافة تحت الكلمات مباشرة */
+        margin-bottom: 20px; /* مسافة أمان من الأسفل */
     }
 
     .main-footer {
@@ -451,12 +452,19 @@ body.teacher-mode .add-btn.teacher-only {
     .pagination-bar .container {
         display: flex;
         flex-direction: row;
-        flex-wrap: nowrap; /* العودة لمنع الالتفاف لضمان الثبات */
         align-items: center;
-        justify-content: space-between;
-        gap: 10px;
-        width: 100%;
-        max-width: 100%;
+        justify-content: center;
+        gap: 15px;
+        width: auto;
+        max-width: fit-content;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        padding: 6px 12px;
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
     }
 
     .add-btn {
@@ -474,52 +482,53 @@ body.teacher-mode .add-btn.teacher-only {
         align-self: center;
     }
 
-    #prevPage,
-    #nextPage {
-        flex: 0 0 auto;
-    }
-
     .page-info {
-        flex: 1 1 auto;
-        min-width: 0;
-        gap: 4px;
-        padding: 8px 10px;
-        background: #f8fafc;
-        border: 1px solid #e2e8f0;
-        border-radius: 12px;
-        font-size: 0.8rem;
-        min-height: 44px;
-        white-space: nowrap;
+        flex: 0 0 auto;
+        background: transparent;
+        border: none;
+        padding: 0;
+        gap: 8px;
+        font-size: 0.9rem;
+        color: #64748b;
+        min-height: auto;
+        box-shadow: none;
     }
 
     .page-info-label {
-        color: #475569;
-    }
-
-    .page-info #totalPages {
-        font-weight: 700;
-        color: var(--primary-color);
-    }
-
-    /* ترتيب مرئي ثابت LTR: prev | معلومات | next حتى مع dir=rtl على الصفحة */
-    .pagination-bar .container {
-        direction: ltr;
-    }
-
-    .pag-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 1.05rem;
-        flex-shrink: 0;
+        display: none; /* إخفاء كلمة Page لتبسيط التصميم */
     }
 
     #pageInput {
-        width: 3.25rem;
-        min-height: 40px;
-        padding: 6px 4px;
-        font-size: 1.05rem;
-        border-radius: 10px;
-        border-width: 1px;
-        background: #fff;
+        width: 2.5rem;
+        background: transparent;
+        border: none;
+        color: var(--primary-color);
+        font-weight: 800;
+        padding: 0;
+        min-height: auto;
+    }
+
+    .page-info #totalPages {
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    .pag-btn {
+        width: 36px;
+        height: 36px;
+        background: #ffffff;
+        color: var(--primary-color);
+        border: 1px solid #f1f5f9;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+        font-size: 0.8rem;
+    }
+
+    .pag-btn:active {
+        transform: scale(0.9);
+        background: #f8fafc;
+    }
+
+    .add-btn {
+        display: none !important; /* إخفاء زر الإضافة تماماً من شريط التنقل في الموبايل */
     }
 }
