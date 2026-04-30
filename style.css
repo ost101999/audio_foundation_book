@@ -208,7 +208,7 @@ input:checked + .slider:before {
     justify-content: center;
     align-items: center;
     font-family: var(--font-word);
-    font-size: clamp(1.8rem, 6vh, 3rem);
+    font-size: clamp(3rem, 12vh, 5.5rem);
     font-weight: 700;
     cursor: pointer;
     box-shadow: var(--shadow);
