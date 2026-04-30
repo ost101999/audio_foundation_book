@@ -210,6 +210,11 @@ body.teacher-mode .add-btn.teacher-only {
     font-weight: 600;
 }
 
+/* عمود «Page / of» على سطح المكتب فقط؛ الموبايل يُكمَّل ضمن استعلام max-width */
+.page-num-sep {
+    display: none;
+}
+
 #pageInput,
 .page-info #totalPages {
     font-family: 'Acme', sans-serif;
@@ -451,17 +456,19 @@ body.teacher-mode .add-btn.teacher-only {
         padding-bottom: max(10px, env(safe-area-inset-bottom, 0px));
     }
 
-    /* flex أوضح من grid عندما زر الإضافة display:none ويتجنب صفًا بارتفاع صفر */
+    /* شريط تصفّح واحد أفقي: أسهم + كبسولة رقم بدون لف — يُحل اختفاء الرقم على الشاشات الضيقة */
     .pagination-bar .container {
         display: flex;
         flex-direction: row;
-        flex-wrap: wrap;
+        flex-wrap: nowrap;
         align-items: center;
-        justify-content: space-between;
-        gap: 8px;
-        row-gap: 10px;
+        justify-content: center;
+        gap: 10px;
         width: 100%;
-        min-height: 52px;
+        min-height: 56px;
+        max-width: 100%;
+        /* ترتيب مرئي ثابت LTR: prev | معلومات | next حتى مع dir=rtl على الصفحة */
+        direction: ltr;
     }
 
     .add-btn {
@@ -479,22 +486,56 @@ body.teacher-mode .add-btn.teacher-only {
         align-self: center;
     }
 
+    body.teacher-mode .pagination-bar .container {
+        flex-wrap: wrap;
+        row-gap: 8px;
+        justify-content: center;
+    }
+
     #prevPage,
     #nextPage {
         flex: 0 0 auto;
     }
 
+    .page-info-desktop-only,
+    .page-info-of-word {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    .page-num-sep {
+        display: inline;
+        padding: 0 1px;
+        color: #94a3b8;
+        font-weight: 600;
+        font-family: inherit;
+    }
+
     .page-info {
-        flex: 1 1 auto;
+        flex-wrap: nowrap;
+        flex: 0 1 auto;
         min-width: 0;
-        gap: 6px;
-        padding: 10px 12px;
-        background: linear-gradient(180deg, #f1f5f9 0%, #e8eef5 100%);
-        border: 1px solid #dce3ec;
-        border-radius: 14px;
-        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85);
-        font-size: 0.85rem;
-        min-height: 48px;
+        max-width: min(200px, 58vw);
+        gap: 4px;
+        padding: 8px 12px;
+        background: rgba(255, 255, 255, 0.92);
+        border: 1px solid rgba(203, 213, 225, 0.95);
+        border-radius: 999px;
+        box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.9),
+            0 2px 10px rgba(15, 23, 42, 0.06);
+        font-size: 0.8rem;
+        min-height: 44px;
+        white-space: nowrap;
+        align-items: center;
+        justify-content: center;
     }
 
     .page-info-label {
@@ -506,25 +547,24 @@ body.teacher-mode .add-btn.teacher-only {
         color: var(--primary-color);
     }
 
-    /* ترتيب مرئي ثابت LTR: prev | معلومات | next حتى مع dir=rtl على الصفحة */
-    .pagination-bar .container {
-        direction: ltr;
-    }
-
     .pag-btn {
-        width: 48px;
-        height: 48px;
-        font-size: 1.05rem;
+        width: 44px;
+        height: 44px;
+        font-size: 1rem;
         flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(74, 144, 226, 0.22);
     }
 
     #pageInput {
-        width: 3.25rem;
-        min-height: 40px;
-        padding: 6px 4px;
-        font-size: 1.05rem;
-        border-radius: 10px;
+        width: 2.5rem;
+        min-width: 2.25rem;
+        max-width: 3rem;
+        min-height: 34px;
+        padding: 4px 2px;
+        font-size: 0.95rem;
+        border-radius: 8px;
         border-width: 1px;
         background: #fff;
+        flex-shrink: 0;
     }
 }
