@@ -216,8 +216,11 @@ body.teacher-mode .add-btn.teacher-only {
 
 #pageInput,
 .page-info #totalPages {
-    font-family: 'Acme', sans-serif;
-    font-variant-numeric: lining-nums;
+    font-family: 'Acme', sans-serif !important;
+    font-variant-numeric: lining-nums !important;
+    font-feature-settings: "lnum" 1 !important;
+    direction: ltr !important;
+    unicode-bidi: isolate !important;
 }
 
 #pageInput {
