@@ -1,35 +1,77 @@
-// Data Structure: 16 cards (4x4 Grid)
-const words = [
-    { id: "word_1", text: "أَ" }, { id: "word_2", text: "بَ" },
-    { id: "word_3", text: "تَ" }, { id: "word_4", text: "ثَ" },
-    { id: "word_5", text: "جَ" }, { id: "word_6", text: "حَ" },
-    { id: "word_7", text: "خَ" }, { id: "word_8", text: "دَ" },
-    { id: "word_9", text: "ذَ" }, { id: "word_10", text: "رَ" },
-    { id: "word_11", text: "زَ" }, { id: "word_12", text: "سَ" },
-    { id: "word_13", text: "شَ" }, { id: "word_14", text: "صَ" },
-    { id: "word_15", text: "ضَ" }, { id: "word_16", text: "طَ" }
-];
+// Data Structure: Multi-page support
+const bookData = {
+    "الحروف بالفتح": [
+        { id: "p1_w1", text: "أَ" }, { id: "p1_w2", text: "بَ" },
+        { id: "p1_w3", text: "تَ" }, { id: "p1_w4", text: "ثَ" },
+        { id: "p1_w5", text: "جَ" }, { id: "p1_w6", text: "حَ" },
+        { id: "p1_w7", text: "خَ" }, { id: "p1_w8", text: "دَ" },
+        { id: "p1_w9", text: "ذَ" }, { id: "p1_w10", text: "رَ" },
+        { id: "p1_w11", text: "زَ" }, { id: "p1_w12", text: "سَ" },
+        { id: "p1_w13", text: "شَ" }, { id: "p1_w14", text: "صَ" },
+        { id: "p1_w15", text: "ضَ" }, { id: "p1_w16", text: "طَ" }
+    ],
+    "الحروف بالكسر": [
+        { id: "p2_w1", text: "إِ" }, { id: "p2_w2", text: "بِ" },
+        { id: "p2_w3", text: "تِ" }, { id: "p2_w4", text: "ثِ" },
+        { id: "p2_w5", text: "جِ" }, { id: "p2_w6", text: "حِ" },
+        { id: "p2_w7", text: "خِ" }, { id: "p2_w8", text: "دِ" },
+        { id: "p2_w9", text: "ذِ" }, { id: "p2_w10", text: "رِ" },
+        { id: "p2_w11", text: "زِ" }, { id: "p2_w12", text: "سِ" },
+        { id: "p2_w13", text: "شِ" }, { id: "p2_w14", text: "صِ" },
+        { id: "p2_w15", text: "ضِ" }, { id: "p2_w16", text: "طِ" }
+    ],
+    "الحروف بالضم": [
+        { id: "p3_w1", text: "أُ" }, { id: "p3_w2", text: "بُ" },
+        { id: "p3_w3", text: "تُ" }, { id: "p3_w4", text: "ثُ" },
+        { id: "p3_w5", text: "جُ" }, { id: "p3_w6", text: "حُ" },
+        { id: "p3_w7", text: "خُ" }, { id: "p3_w8", text: "دُ" },
+        { id: "p3_w9", text: "ذُ" }, { id: "p3_w10", text: "رُ" },
+        { id: "p3_w11", text: "زُ" }, { id: "p3_w12", text: "سُ" },
+        { id: "p3_w13", text: "شُ" }, { id: "p3_w14", text: "صُ" },
+        { id: "p3_w15", text: "ضُ" }, { id: "p3_w16", text: "طُ" }
+    ]
+};
 
 // State Management
+let currentPage = Object.keys(bookData)[0];
 let isTeacherMode = false;
 let mediaRecorder = null;
 let audioChunks = [];
 let currentlyRecordingId = null;
-let dirHandle = null; // To store the directory handle for direct saving
+let dirHandle = null;
 
 // DOM Elements
 const wordsGrid = document.getElementById('wordsGrid');
+const pageTabs = document.getElementById('pageTabs');
 const modeToggle = document.getElementById('modeToggle');
 
 // Initialize App
 function init() {
+    renderTabs();
     renderCards();
     setupEventListeners();
+}
+
+// Render Page Navigation Tabs
+function renderTabs() {
+    pageTabs.innerHTML = '';
+    Object.keys(bookData).forEach(pageName => {
+        const btn = document.createElement('button');
+        btn.className = `nav-btn ${pageName === currentPage ? 'active' : ''}`;
+        btn.textContent = pageName;
+        btn.onclick = () => {
+            currentPage = pageName;
+            renderTabs();
+            renderCards();
+        };
+        pageTabs.appendChild(btn);
+    });
 }
 
 // Render Cards Dynamically
 function renderCards() {
     wordsGrid.innerHTML = '';
+    const words = bookData[currentPage];
     words.forEach(word => {
         const card = document.createElement('div');
         card.className = 'word-card';
@@ -46,7 +88,6 @@ function setupEventListeners() {
         isTeacherMode = e.target.checked;
         document.body.classList.toggle('teacher-mode', isTeacherMode);
         
-        // Stop any active recording if mode changes
         if (!isTeacherMode && currentlyRecordingId) {
             stopRecording();
         }
@@ -56,12 +97,11 @@ function setupEventListeners() {
 // Main Interaction Logic
 async function handleCardClick(id) {
     if (isTeacherMode) {
-        // If folder handle is not set, request it on first click
         if (!dirHandle) {
             try {
                 dirHandle = await window.showDirectoryPicker({ mode: 'readwrite' });
             } catch (err) {
-                console.warn("User cancelled directory picker. Falling back to normal downloads.");
+                console.warn("User cancelled directory picker.");
             }
         }
 
