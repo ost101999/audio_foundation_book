@@ -177,16 +177,15 @@ body.teacher-mode .add-btn.teacher-only {
     border: none;
     background: var(--primary-color);
     color: white;
-    font-size: 1.2rem;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: var(--transition);
-    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
 }
 
-.pag-btn:hover {
+.pag-btn:hover:not(:disabled) {
     transform: scale(1.1);
     background: #357abd;
 }
@@ -194,8 +193,11 @@ body.teacher-mode .add-btn.teacher-only {
 .pag-btn:disabled {
     background: #cbd5e0;
     cursor: not-allowed;
-    transform: none;
     box-shadow: none;
+}
+
+.pag-btn svg {
+    display: block;
 }
 
 .page-info {
@@ -216,8 +218,11 @@ body.teacher-mode .add-btn.teacher-only {
 
 #pageInput,
 .page-info #totalPages {
-    font-family: 'Acme', sans-serif;
-    font-variant-numeric: lining-nums;
+    font-family: 'Acme', sans-serif !important;
+    font-variant-numeric: lining-nums !important;
+    font-feature-settings: "lnum" 1 !important;
+    direction: ltr !important;
+    unicode-bidi: isolate !important;
 }
 
 #pageInput {
@@ -292,9 +297,6 @@ body.teacher-mode .add-btn.teacher-only {
 }
 
 @media (min-width: 480px) {
-    body {
-        padding-bottom: 0; /* Let flex handle it */
-    }
 
     .container {
         max-width: none;
@@ -313,11 +315,19 @@ body.teacher-mode .add-btn.teacher-only {
     }
 
     .pagination-bar {
-        position: static; /* Move it with the zoomed content */
-        width: 100%;
-        margin-top: 20px;
+        position: fixed;
+        inset-inline: 0;
+        bottom: 30px; /* Raised slightly from the bottom */
+        z-index: 100;
         background: transparent;
+        backdrop-filter: none;
+        padding: 0;
         box-shadow: none;
+        margin-top: 0;
+    }
+
+    body {
+        padding-bottom: 120px; /* Space for zoomed fixed bar */
     }
 
 

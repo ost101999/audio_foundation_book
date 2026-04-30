@@ -136,16 +136,31 @@ function renderCards() {
 }
 
 function editWord(id) {
-    const words = bookData[currentPageIndex].words;
-    const wordIndex = words.findIndex(w => w.id === id);
-    if (wordIndex === -1) return;
+    if (!isTeacherMode) return;
 
-    const newText = prompt("أدخل النص الجديد للكلمة:", words[wordIndex].text);
-    if (newText !== null) {
-        words[wordIndex].text = newText.trim();
-        saveData();
-        renderCards();
+    let targetWord = null;
+    for (const page of bookData) {
+        const word = page.words.find(w => w.id === id);
+        if (word) {
+            targetWord = word;
+            break;
+        }
     }
+    if (!targetWord) return;
+
+    const newText = prompt("أدخل النص الجديد للكلمة:", targetWord.text);
+    if (newText === null) return;
+
+    const normalizedText = newText.trim();
+    for (const page of bookData) {
+        const word = page.words.find(w => w.id === id);
+        if (word) {
+            word.text = normalizedText;
+        }
+    }
+
+    saveData();
+    renderCards();
 }
 // Handle Navigation & Mode Change
 function setupEventListeners() {
