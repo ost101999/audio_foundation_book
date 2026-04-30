@@ -34,13 +34,17 @@
             <div class="pagination-bar" aria-label="تصفح الصفحات">
                 <div class="pagination-inner">
                     <button id="addPageBtn" class="add-btn teacher-only" title="إضافة صفحة جديدة">+</button>
-                    <button id="prevPage" class="pag-btn">◀</button>
+                    <button id="prevPage" class="pag-btn" title="الصفحة السابقة">
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </button>
                     <div class="page-info" dir="ltr" lang="en">
                         <span class="page-info-label">Page</span>
                         <input type="text" id="pageInput" lang="en" inputmode="numeric" min="1" value="1">
                         <span class="page-info-label">of <span id="totalPages">1</span></span>
                     </div>
-                    <button id="nextPage" class="pag-btn">▶</button>
+                    <button id="nextPage" class="pag-btn" title="الصفحة التالية">
+                        <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                    </button>
                 </div>
             </div>
         </div>

@@ -177,16 +177,15 @@ body.teacher-mode .add-btn.teacher-only {
     border: none;
     background: var(--primary-color);
     color: white;
-    font-size: 1.2rem;
     cursor: pointer;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: var(--transition);
-    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+    box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
 }
 
-.pag-btn:hover {
+.pag-btn:hover:not(:disabled) {
     transform: scale(1.1);
     background: #357abd;
 }
@@ -194,8 +193,11 @@ body.teacher-mode .add-btn.teacher-only {
 .pag-btn:disabled {
     background: #cbd5e0;
     cursor: not-allowed;
-    transform: none;
     box-shadow: none;
+}
+
+.pag-btn svg {
+    display: block;
 }
 
 .page-info {
