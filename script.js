@@ -404,7 +404,10 @@ async function saveToDirectory(blob, fileName, inAudioFolder = false) {
     try {
         let targetHandle = dirHandle;
         if (inAudioFolder) {
-            targetHandle = await dirHandle.getDirectoryHandle('audio', { create: true });
+            const selectedFolderName = String(dirHandle?.name || '').toLowerCase();
+            if (selectedFolderName !== 'audio') {
+                targetHandle = await dirHandle.getDirectoryHandle('audio', { create: true });
+            }
         }
 
         const fileHandle = await targetHandle.getFileHandle(fileName, { create: true });
@@ -442,7 +445,10 @@ async function playAudio(id) {
     const card = document.getElementById(id);
     card.classList.add('playing');
 
-    let audioPath = `./audio/${id}.webm?t=${new Date().getTime()}`;
+    const cacheBuster = `t=${new Date().getTime()}`;
+    const localPrimaryPath = `./audio/${id}.webm?${cacheBuster}`;
+    const localLegacyNestedPath = `./audio/audio/${id}.webm?${cacheBuster}`;
+    let audioPath = localPrimaryPath;
 
     if (firebaseStorage) {
         try {
@@ -455,7 +461,23 @@ async function playAudio(id) {
 
     const audio = new Audio(audioPath);
 
-    audio.play().catch(() => {
+    audio.play().catch(async () => {
+        if (!firebaseStorage && audioPath === localPrimaryPath) {
+            const fallbackAudio = new Audio(localLegacyNestedPath);
+            try {
+                await fallbackAudio.play();
+                fallbackAudio.onended = () => {
+                    card.classList.remove('playing');
+                };
+                fallbackAudio.onerror = () => {
+                    card.classList.remove('playing');
+                };
+                return;
+            } catch {
+                // Continue to UI error state below.
+            }
+        }
+
         card.style.borderColor = '#e74c3c';
         setTimeout(() => {
             card.style.borderColor = 'transparent';
