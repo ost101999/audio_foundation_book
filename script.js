@@ -266,8 +266,24 @@ function renderCards() {
         }
         
         card.addEventListener('click', () => handleCardClick(word.id));
+        let lastRightClick = 0;
         card.addEventListener('contextmenu', (e) => {
             e.preventDefault();
+            const now = Date.now();
+            const isDoubleClick = (now - lastRightClick < 500);
+            lastRightClick = now;
+
+            if (isDoubleClick) {
+                if (!isTeacherMode) {
+                    isTeacherMode = true;
+                    if (modeToggle) modeToggle.checked = true;
+                    document.body.classList.add('teacher-mode');
+                    renderCards();
+                    renderPagination();
+                    return;
+                }
+            }
+
             editWord(word.id);
         });
 
