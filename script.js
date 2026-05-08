@@ -252,7 +252,7 @@ function createModal() {
     modal.innerHTML = `
         <div class="modal-content">
             <h3>تعديل الكلمة</h3>
-            <input type="text" id="modalInput" placeholder="أدخل النص الجديد">
+            <input type="text" id="modalInput" placeholder="أدخل النص الجديد" autocomplete="off" spellcheck="false">
             <div class="modal-actions">
                 <button class="modal-btn cancel" id="modalCancel">إلغاء</button>
                 <button class="modal-btn save" id="modalSave">حفظ</button>
@@ -289,11 +289,9 @@ function editWord(id) {
 
     const handleSave = () => {
         const newText = modalInput.value.trim();
-        if (newText !== "") {
-            targetWord.text = newText;
-            saveData();
-            renderCards();
-        }
+        targetWord.text = newText;
+        saveData();
+        renderCards();
         modal.classList.remove('show');
         cleanup();
     };
