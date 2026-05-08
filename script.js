@@ -167,21 +167,9 @@ const addPageBtn = document.getElementById('addPageBtn');
 
 // Initialize App
 async function init() {
-    try {
-        const res = await fetch(BOOK_JSON_FILE, { cache: 'no-store' });
-        bookData = await res.json();
-        console.log("Forced load from local JSON file.");
-        
-        if (bookDocRef) {
-            await setDoc(bookDocRef, {
-                pages: bookData,
-                updatedAt: serverTimestamp()
-            }, { merge: true });
-            console.log("Updated Firestore with local data.");
-        }
-    } catch (e) {
-        console.error("Failed to force load local data:", e);
-        bookData = await loadBookData();
+    bookData = await loadBookData();
+    if (!Array.isArray(bookData) || bookData.length === 0) {
+        bookData = JSON.parse(JSON.stringify(defaultData));
     }
     currentPageIndex = Math.min(currentPageIndex, bookData.length - 1);
     currentPageIndex = Math.max(0, currentPageIndex);
@@ -226,7 +214,21 @@ function renderPagination() {
 // Render Cards Dynamically
 function renderCards() {
     wordsGrid.innerHTML = '';
-    const words = bookData[currentPageIndex].words;
+    const page = bookData[currentPageIndex];
+    const words = page.words;
+    
+    // تأكد إن الصفحة فيها 16 بطاقة على الأقل
+    let needed = 16 - words.length;
+    if (needed > 0) {
+        for (let i = 0; i < needed; i++) {
+            words.push({
+                id: `p${currentPageIndex + 1}_w${words.length + 1}`,
+                text: ""
+            });
+        }
+        saveData(); // حفظ البيانات الجديدة في السحاب/المتصفح
+    }
+
     words.forEach(word => {
         const card = document.createElement('div');
         card.className = 'word-card';
@@ -391,6 +393,21 @@ function setupEventListeners() {
 // Main Interaction Logic
 async function handleCardClick(id) {
     if (isTeacherMode) {
+        let targetWord = null;
+        for (const page of bookData) {
+            const word = page.words.find(w => w.id === id);
+            if (word) {
+                targetWord = word;
+                break;
+            }
+        }
+
+        // إذا كانت الكلمة فارغة، افتح نافذة التعديل بدلاً من التسجيل
+        if (targetWord && targetWord.text.trim() === "") {
+            editWord(id);
+            return;
+        }
+
         if (currentlyRecordingId === id) {
             stopRecording();
         } else {
