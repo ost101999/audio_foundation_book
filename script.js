@@ -167,9 +167,21 @@ const addPageBtn = document.getElementById('addPageBtn');
 
 // Initialize App
 async function init() {
-    bookData = await loadBookData();
-    if (!Array.isArray(bookData) || bookData.length === 0) {
-        bookData = JSON.parse(JSON.stringify(defaultData));
+    try {
+        const res = await fetch(BOOK_JSON_FILE, { cache: 'no-store' });
+        bookData = await res.json();
+        console.log("Forced load from local JSON file.");
+        
+        if (bookDocRef) {
+            await setDoc(bookDocRef, {
+                pages: bookData,
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+            console.log("Updated Firestore with local data.");
+        }
+    } catch (e) {
+        console.error("Failed to force load local data:", e);
+        bookData = await loadBookData();
     }
     currentPageIndex = Math.min(currentPageIndex, bookData.length - 1);
     currentPageIndex = Math.max(0, currentPageIndex);
@@ -231,6 +243,24 @@ function renderCards() {
     });
 }
 
+function createModal() {
+    const modal = document.createElement('div');
+    modal.id = 'editModal';
+    modal.className = 'modal';
+    modal.innerHTML = `
+        <div class="modal-content">
+            <h3>تعديل الكلمة</h3>
+            <input type="text" id="modalInput" placeholder="أدخل النص الجديد">
+            <div class="modal-actions">
+                <button class="modal-btn cancel" id="modalCancel">إلغاء</button>
+                <button class="modal-btn save" id="modalSave">حفظ</button>
+            </div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+    return modal;
+}
+
 function editWord(id) {
     if (!isTeacherMode) return;
 
@@ -244,19 +274,53 @@ function editWord(id) {
     }
     if (!targetWord) return;
 
-    const newText = prompt("أدخل النص الجديد للكلمة:", targetWord.text);
-    if (newText === null) return;
+    const modal = document.getElementById('editModal') || createModal();
+    const modalInput = document.getElementById('modalInput');
+    const modalSave = document.getElementById('modalSave');
+    const modalCancel = document.getElementById('modalCancel');
 
-    const normalizedText = newText.trim();
-    for (const page of bookData) {
-        const word = page.words.find(w => w.id === id);
-        if (word) {
-            word.text = normalizedText;
+    modalInput.value = targetWord.text;
+    modal.classList.add('show');
+
+    // Focus input
+    setTimeout(() => modalInput.focus(), 100);
+
+    const handleSave = () => {
+        const newText = modalInput.value.trim();
+        if (newText !== "") {
+            targetWord.text = newText;
+            saveData();
+            renderCards();
         }
-    }
+        modal.classList.remove('show');
+        cleanup();
+    };
 
-    saveData();
-    renderCards();
+    const handleCancel = () => {
+        modal.classList.remove('show');
+        cleanup();
+    };
+
+    const cleanup = () => {
+        modalSave.removeEventListener('click', handleSave);
+        modalCancel.removeEventListener('click', handleCancel);
+        modal.removeEventListener('click', handleOutsideClick);
+        modalInput.removeEventListener('keypress', handleKeyPress);
+    };
+
+    const handleOutsideClick = (e) => {
+        if (e.target === modal) handleCancel();
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') handleSave();
+        if (e.key === 'Escape') handleCancel();
+    };
+
+    modalSave.addEventListener('click', handleSave);
+    modalCancel.addEventListener('click', handleCancel);
+    modal.addEventListener('click', handleOutsideClick);
+    modalInput.addEventListener('keypress', handleKeyPress);
 }
 // Handle Navigation & Mode Change
 function setupEventListeners() {
