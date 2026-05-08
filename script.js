@@ -105,9 +105,9 @@ async function loadBookData() {
     return defaultData;
 }
 
-function saveData() {
+async function saveData() {
     localStorage.setItem('readingAppData', JSON.stringify(bookData));
-    persistBookDataIfTeacher();
+    await persistBookDataIfTeacher();
 }
 
 async function persistBookDataIfTeacher() {
@@ -287,13 +287,26 @@ function editWord(id) {
     // Focus input
     setTimeout(() => modalInput.focus(), 100);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         const newText = modalInput.value.trim();
         targetWord.text = newText;
-        saveData();
-        renderCards();
-        modal.classList.remove('show');
-        cleanup();
+        
+        const saveBtn = document.getElementById('modalSave');
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = "جاري الحفظ...";
+        saveBtn.disabled = true;
+        
+        try {
+            await saveData();
+            renderCards();
+        } catch (e) {
+            console.error(e);
+        } finally {
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
+            modal.classList.remove('show');
+            cleanup();
+        }
     };
 
     const handleCancel = () => {
