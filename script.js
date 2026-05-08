@@ -251,12 +251,38 @@ function renderCards() {
         }
     }
 
-    words.forEach(word => {
-        // في التوزيع العمودي لا نعرض البطاقات الفارغة
-        if (page.layout === "vertical" && word.text.trim() === "") {
-            return;
+    if (page.layout === "central") {
+        // توزيع مركزي: تجميع الكلمات في صفوف (كل صف 4 كلمات كحد أقصى)
+        for (let i = 0; i < words.length; i += 4) {
+            const rowWords = words.slice(i, i + 4);
+            const hasText = rowWords.some(w => w.text.trim() !== "");
+            if (!hasText) continue; // تخطي الصفوف الفارغة تماماً
+            
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'grid-row-centered';
+            
+            rowWords.forEach(word => {
+                if (word.text.trim() === "") return; // تخطي المربعات الفارغة في هذا الصف
+                
+                const card = createCardElement(word);
+                rowDiv.appendChild(card);
+            });
+            
+            wordsGrid.appendChild(rowDiv);
         }
-        
+    } else {
+        // الوضع الطبيعي أو التوزيع العمودي
+        words.forEach(word => {
+            if (page.layout === "vertical" && word.text.trim() === "") {
+                return;
+            }
+            const card = createCardElement(word);
+            wordsGrid.appendChild(card);
+        });
+    }
+
+    // دالة مساعدة لإنشاء البطاقة لتجنب تكرار الكود
+    function createCardElement(word) {
         const card = document.createElement('div');
         card.className = 'word-card';
         card.id = word.id;
@@ -287,9 +313,9 @@ function renderCards() {
 
             editWord(word.id);
         });
-
-        wordsGrid.appendChild(card);
-    });
+        
+        return card;
+    }
 }
 
 function createModal() {
