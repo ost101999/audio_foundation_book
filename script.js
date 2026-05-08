@@ -164,6 +164,7 @@ const totalPagesSpan = document.getElementById('totalPages');
 const prevPageBtn = document.getElementById('prevPage');
 const nextPageBtn = document.getElementById('nextPage');
 const addPageBtn = document.getElementById('addPageBtn');
+const deletePageBtn = document.getElementById('deletePageBtn');
 const layoutVerticalBtn = document.getElementById('layoutVerticalBtn');
 const layoutCentralBtn = document.getElementById('layoutCentralBtn');
 
@@ -501,6 +502,30 @@ function setupEventListeners() {
         renderPagination();
         renderCards();
     });
+
+    if (deletePageBtn) {
+        deletePageBtn.addEventListener('click', () => {
+            if (!isTeacherMode) return;
+            
+            if (bookData.length <= 1) {
+                alert("لا يمكن حذف الصفحة الأخيرة!");
+                return;
+            }
+            
+            if (confirm("هل أنت متأكد من حذف هذه الصفحة الحالية؟")) {
+                bookData.splice(currentPageIndex, 1);
+                saveData();
+                
+                // تعديل الفهرس الحالي إذا لزم الأمر
+                if (currentPageIndex >= bookData.length) {
+                    currentPageIndex = bookData.length - 1;
+                }
+                
+                renderPagination();
+                renderCards();
+            }
+        });
+    }
 }
 
 // Main Interaction Logic
