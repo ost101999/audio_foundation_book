@@ -589,21 +589,20 @@ async function startRecording(id) {
         }
 
         const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
+        const recorder = new MediaRecorder(stream);
+        const chunks = [];
 
-        mediaRecorder.ondataavailable = (event) => {
-            audioChunks.push(event.data);
+        recorder.ondataavailable = (event) => {
+            chunks.push(event.data);
         };
 
-        mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-
+        recorder.onstop = async () => {
+            const audioBlob = new Blob(chunks, { type: 'audio/webm' });
             await saveAudioForWord(audioBlob, id);
-            
             stream.getTracks().forEach(track => track.stop());
         };
 
+        mediaRecorder = recorder;
         mediaRecorder.start();
         currentlyRecordingId = id;
         document.getElementById(id).classList.add('recording');
