@@ -448,9 +448,8 @@ function setupEventListeners() {
         }
     });
 
-    // التنقل بأزرار الماوس (Back & Forward) في وضع المعلم
+    // التنقل بأزرار الماوس (Back & Forward)
     const handleMouseNav = (e) => {
-        if (!isTeacherMode) return;
         if (e.button === 3 || e.button === 4) {
             e.preventDefault();
             if (e.type === 'mouseup') {
