@@ -881,8 +881,10 @@ body.teacher-mode .toggle-btn {
         display: flex;
         flex-direction: column;
         align-items: center;
+        justify-content: center; /* توسيط رأسي */
         gap: 12px; /* المسافة الأصلية */
         max-width: 500px; /* العرض الأصلي */
+        height: 500px; /* الارتفاع الأصلي للشبكة لجعل التوسيط الرأسي يعمل */
         margin: 40px auto;
     }
 
