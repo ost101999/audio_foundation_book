@@ -448,9 +448,8 @@ function setupEventListeners() {
         }
     });
 
-    // التنقل بأزرار الماوس (Back & Forward) في وضع المعلم
+    // التنقل بأزرار الماوس (Back & Forward)
     const handleMouseNav = (e) => {
-        if (!isTeacherMode) return;
         if (e.button === 3 || e.button === 4) {
             e.preventDefault();
             if (e.type === 'mouseup') {
@@ -588,22 +587,32 @@ async function startRecording(id) {
             }
         }
 
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        mediaRecorder = new MediaRecorder(stream);
-        audioChunks = [];
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+            }
+        });
 
-        mediaRecorder.ondataavailable = (event) => {
-            audioChunks.push(event.data);
+        let options = { audioBitsPerSecond: 256000 };
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            options.mimeType = 'audio/webm;codecs=opus';
+        }
+        const recorder = new MediaRecorder(stream, options);
+        const chunks = [];
+
+        recorder.ondataavailable = (event) => {
+            chunks.push(event.data);
         };
 
-        mediaRecorder.onstop = async () => {
-            const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-
+        recorder.onstop = async () => {
+            const audioBlob = new Blob(chunks, { type: options.mimeType || 'audio/webm' });
             await saveAudioForWord(audioBlob, id);
-            
             stream.getTracks().forEach(track => track.stop());
         };
 
+        mediaRecorder = recorder;
         mediaRecorder.start();
         currentlyRecordingId = id;
         document.getElementById(id).classList.add('recording');
