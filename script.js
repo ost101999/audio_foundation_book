@@ -587,8 +587,19 @@ async function startRecording(id) {
             }
         }
 
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        const recorder = new MediaRecorder(stream);
+        const stream = await navigator.mediaDevices.getUserMedia({
+            audio: {
+                echoCancellation: false,
+                noiseSuppression: false,
+                autoGainControl: false
+            }
+        });
+
+        let options = { audioBitsPerSecond: 256000 };
+        if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+            options.mimeType = 'audio/webm;codecs=opus';
+        }
+        const recorder = new MediaRecorder(stream, options);
         const chunks = [];
 
         recorder.ondataavailable = (event) => {
@@ -596,7 +607,7 @@ async function startRecording(id) {
         };
 
         recorder.onstop = async () => {
-            const audioBlob = new Blob(chunks, { type: 'audio/webm' });
+            const audioBlob = new Blob(chunks, { type: options.mimeType || 'audio/webm' });
             await saveAudioForWord(audioBlob, id);
             stream.getTracks().forEach(track => track.stop());
         };
