@@ -164,6 +164,7 @@ const totalPagesSpan = document.getElementById('totalPages');
 const prevPageBtn = document.getElementById('prevPage');
 const nextPageBtn = document.getElementById('nextPage');
 const addPageBtn = document.getElementById('addPageBtn');
+const toggleVerticalBtn = document.getElementById('toggleVerticalBtn');
 
 // Initialize App
 async function init() {
@@ -209,6 +210,17 @@ function renderPagination() {
     pageInput.value = currentPageIndex + 1;
     prevPageBtn.disabled = currentPageIndex === 0;
     nextPageBtn.disabled = currentPageIndex === bookData.length - 1;
+    updateVerticalBtnState();
+}
+
+function updateVerticalBtnState() {
+    if (!toggleVerticalBtn) return;
+    const page = bookData[currentPageIndex];
+    if (page?.layout === "vertical") {
+        toggleVerticalBtn.classList.add('active');
+    } else {
+        toggleVerticalBtn.classList.remove('active');
+    }
 }
 
 // Render Cards Dynamically
@@ -217,23 +229,41 @@ function renderCards() {
     const page = bookData[currentPageIndex];
     const words = page.words;
     
-    // تأكد إن الصفحة فيها 16 بطاقة على الأقل
-    let needed = 16 - words.length;
-    if (needed > 0) {
-        for (let i = 0; i < needed; i++) {
-            words.push({
-                id: `p${currentPageIndex + 1}_w${words.length + 1}`,
-                text: ""
-            });
+    // تطبيق التوزيع العمودي
+    if (page.layout === "vertical") {
+        wordsGrid.classList.add('vertical-layout');
+    } else {
+        wordsGrid.classList.remove('vertical-layout');
+    }
+    
+    // تأكد إن الصفحة فيها 16 بطاقة على الأقل (فقط في العرض الشبكي)
+    if (page.layout !== "vertical") {
+        let needed = 16 - words.length;
+        if (needed > 0) {
+            for (let i = 0; i < needed; i++) {
+                words.push({
+                    id: `p${currentPageIndex + 1}_w${words.length + 1}`,
+                    text: ""
+                });
+            }
+            saveData();
         }
-        saveData(); // حفظ البيانات الجديدة في السحاب/المتصفح
     }
 
     words.forEach(word => {
+        // في التوزيع العمودي لا نعرض البطاقات الفارغة
+        if (page.layout === "vertical" && word.text.trim() === "") {
+            return;
+        }
+        
         const card = document.createElement('div');
         card.className = 'word-card';
         card.id = word.id;
         card.textContent = word.text;
+        
+        if (word.highlighted) {
+            card.classList.add('highlighted');
+        }
         
         card.addEventListener('click', () => handleCardClick(word.id));
         card.addEventListener('contextmenu', (e) => {
@@ -253,6 +283,9 @@ function createModal() {
         <div class="modal-content">
             <h3>تعديل الكلمة</h3>
             <input type="text" id="modalInput" placeholder="أدخل النص الجديد" autocomplete="off" spellcheck="false">
+            <div class="modal-options">
+                <label><input type="checkbox" id="modalHighlight"> تمييز الكلمة (إطار فخم)</label>
+            </div>
             <div class="modal-actions">
                 <button class="modal-btn cancel" id="modalCancel">إلغاء</button>
                 <button class="modal-btn save" id="modalSave">حفظ</button>
@@ -280,8 +313,10 @@ function editWord(id) {
     const modalInput = document.getElementById('modalInput');
     const modalSave = document.getElementById('modalSave');
     const modalCancel = document.getElementById('modalCancel');
+    const modalHighlight = document.getElementById('modalHighlight');
 
     modalInput.value = targetWord.text;
+    modalHighlight.checked = !!targetWord.highlighted;
     modal.classList.add('show');
 
     // Focus input
@@ -290,6 +325,7 @@ function editWord(id) {
     const handleSave = async () => {
         const newText = modalInput.value.trim();
         targetWord.text = newText;
+        targetWord.highlighted = modalHighlight.checked;
         
         const saveBtn = document.getElementById('modalSave');
         const originalText = saveBtn.textContent;
@@ -337,6 +373,17 @@ function editWord(id) {
 }
 // Handle Navigation & Mode Change
 function setupEventListeners() {
+    if (toggleVerticalBtn) {
+        toggleVerticalBtn.addEventListener('click', () => {
+            if (!isTeacherMode) return;
+            const page = bookData[currentPageIndex];
+            page.layout = page.layout === "vertical" ? "grid" : "vertical";
+            saveData();
+            renderCards();
+            updateVerticalBtnState();
+        });
+    }
+
     modeToggle.addEventListener('change', (e) => {
         isTeacherMode = e.target.checked;
         document.body.classList.toggle('teacher-mode', isTeacherMode);
