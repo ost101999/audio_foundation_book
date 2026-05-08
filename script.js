@@ -447,18 +447,19 @@ function setupEventListeners() {
     addPageBtn.addEventListener('click', () => {
         if (!isTeacherMode) return;
         
-        const newPageIndex = bookData.length + 1;
         const newPage = {
-            name: `الصفحة ${newPageIndex}`,
+            name: `صفحة جديدة`,
             words: Array.from({ length: 16 }, (_, i) => ({
-                id: `p${newPageIndex}_w${i + 1}`,
-                text: "" // Empty words
+                id: `p${Date.now()}_w${i + 1}`, // معرف فريد باستخدام الوقت
+                text: ""
             }))
         };
         
-        bookData.push(newPage);
+        // إدراج الصفحة بعد الصفحة الحالية
+        bookData.splice(currentPageIndex + 1, 0, newPage);
         saveData();
-        currentPageIndex = bookData.length - 1; // Go to new page
+        
+        currentPageIndex = currentPageIndex + 1; // الانتقال للصفحة الجديدة
         renderPagination();
         renderCards();
     });
