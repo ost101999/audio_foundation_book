@@ -841,3 +841,73 @@ body.teacher-mode .toggle-btn {
     width: auto;
     margin-bottom: 0;
 }
+
+/* أزرار التحكم الفخمة في الهيدر */
+.teacher-controls {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.premium-btn {
+    padding: 6px 15px;
+    border-radius: 15px;
+    border: 1px solid #e2e8f0;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--text-color);
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.premium-btn:hover {
+    background: #f0f3f6;
+    transform: translateY(-1px);
+}
+
+.premium-btn.active {
+    background: var(--primary-color);
+    color: white;
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 10px rgba(74, 144, 226, 0.3);
+}
+
+/* التوزيع المركزي */
+@media (min-width: 480px) {
+    .words-grid.central-layout {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 50vh;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .words-grid.central-layout .word-card {
+        width: auto;
+        min-width: 150px;
+        max-width: 300px;
+        aspect-ratio: auto;
+        padding: 15px 25px;
+        font-size: 2.5rem;
+    }
+}
+
+/* إخفاء أزرار المعلم في وضع الطالب بدقة */
+.teacher-only {
+    display: none !important;
+}
+
+body.teacher-mode .teacher-only {
+    display: inherit !important;
+}
+
+body.teacher-mode .teacher-controls.teacher-only {
+    display: flex !important;
+}

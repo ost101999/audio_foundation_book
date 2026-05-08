@@ -164,7 +164,8 @@ const totalPagesSpan = document.getElementById('totalPages');
 const prevPageBtn = document.getElementById('prevPage');
 const nextPageBtn = document.getElementById('nextPage');
 const addPageBtn = document.getElementById('addPageBtn');
-const toggleVerticalBtn = document.getElementById('toggleVerticalBtn');
+const layoutVerticalBtn = document.getElementById('layoutVerticalBtn');
+const layoutCentralBtn = document.getElementById('layoutCentralBtn');
 
 // Initialize App
 async function init() {
@@ -210,17 +211,15 @@ function renderPagination() {
     pageInput.value = currentPageIndex + 1;
     prevPageBtn.disabled = currentPageIndex === 0;
     nextPageBtn.disabled = currentPageIndex === bookData.length - 1;
-    updateVerticalBtnState();
+    updateLayoutButtons();
 }
 
-function updateVerticalBtnState() {
-    if (!toggleVerticalBtn) return;
+function updateLayoutButtons() {
+    if (!layoutVerticalBtn || !layoutCentralBtn) return;
     const page = bookData[currentPageIndex];
-    if (page?.layout === "vertical") {
-        toggleVerticalBtn.classList.add('active');
-    } else {
-        toggleVerticalBtn.classList.remove('active');
-    }
+    
+    layoutVerticalBtn.classList.toggle('active', page?.layout === "vertical");
+    layoutCentralBtn.classList.toggle('active', page?.layout === "central");
 }
 
 // Render Cards Dynamically
@@ -229,15 +228,17 @@ function renderCards() {
     const page = bookData[currentPageIndex];
     const words = page.words;
     
-    // تطبيق التوزيع العمودي
+    // تطبيق التنسيقات الخاصة
+    wordsGrid.classList.remove('vertical-layout', 'central-layout');
     if (page.layout === "vertical") {
         wordsGrid.classList.add('vertical-layout');
-    } else {
-        wordsGrid.classList.remove('vertical-layout');
+    } else if (page.layout === "central") {
+        wordsGrid.classList.add('central-layout');
     }
     
-    // تأكد إن الصفحة فيها 16 بطاقة على الأقل (فقط في العرض الشبكي)
-    if (page.layout !== "vertical") {
+    // تأكد إن الصفحة فيها 16 بطاقة على الأقل (فقط في الوضع الطبيعي - شبكي)
+    const isSpecialLayout = page.layout === "vertical" || page.layout === "central";
+    if (!isSpecialLayout) {
         let needed = 16 - words.length;
         if (needed > 0) {
             for (let i = 0; i < needed; i++) {
@@ -389,14 +390,25 @@ function editWord(id) {
 }
 // Handle Navigation & Mode Change
 function setupEventListeners() {
-    if (toggleVerticalBtn) {
-        toggleVerticalBtn.addEventListener('click', () => {
+    if (layoutVerticalBtn) {
+        layoutVerticalBtn.addEventListener('click', () => {
             if (!isTeacherMode) return;
             const page = bookData[currentPageIndex];
             page.layout = page.layout === "vertical" ? "grid" : "vertical";
             saveData();
             renderCards();
-            updateVerticalBtnState();
+            updateLayoutButtons();
+        });
+    }
+
+    if (layoutCentralBtn) {
+        layoutCentralBtn.addEventListener('click', () => {
+            if (!isTeacherMode) return;
+            const page = bookData[currentPageIndex];
+            page.layout = page.layout === "central" ? "grid" : "central";
+            saveData();
+            renderCards();
+            updateLayoutButtons();
         });
     }
 
