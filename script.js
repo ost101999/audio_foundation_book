@@ -448,6 +448,25 @@ function setupEventListeners() {
         }
     });
 
+    // التنقل بأزرار الماوس (Back & Forward) في وضع المعلم
+    const handleMouseNav = (e) => {
+        if (!isTeacherMode) return;
+        if (e.button === 3 || e.button === 4) {
+            e.preventDefault();
+            if (e.type === 'mouseup') {
+                if (e.button === 3 && currentPageIndex > 0) {
+                    currentPageIndex--;
+                } else if (e.button === 4 && currentPageIndex < bookData.length - 1) {
+                    currentPageIndex++;
+                }
+                renderPagination();
+                renderCards();
+            }
+        }
+    };
+    window.addEventListener('mousedown', handleMouseNav);
+    window.addEventListener('mouseup', handleMouseNav);
+
     prevPageBtn.addEventListener('click', () => {
         if (currentPageIndex > 0) {
             currentPageIndex--;
