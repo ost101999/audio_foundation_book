@@ -454,10 +454,10 @@ function setupEventListeners() {
         if (e.button === 3 || e.button === 4) {
             e.preventDefault();
             if (e.type === 'mouseup') {
-                if (e.button === 3 && currentPageIndex > 0) {
-                    currentPageIndex--;
-                } else if (e.button === 4 && currentPageIndex < bookData.length - 1) {
+                if (e.button === 3 && currentPageIndex < bookData.length - 1) {
                     currentPageIndex++;
+                } else if (e.button === 4 && currentPageIndex > 0) {
+                    currentPageIndex--;
                 }
                 renderPagination();
                 renderCards();
