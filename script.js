@@ -466,6 +466,37 @@ function setupEventListeners() {
     window.addEventListener('mousedown', handleMouseNav);
     window.addEventListener('mouseup', handleMouseNav);
 
+    // التنقل بالتاتش (Swipe) في الموبايل
+    let touchstartX = 0;
+    let touchendX = 0;
+    
+    const handleTouchStart = (e) => {
+        touchstartX = e.changedTouches[0].screenX;
+    };
+    
+    const handleTouchEnd = (e) => {
+        touchendX = e.changedTouches[0].screenX;
+        const diffX = touchendX - touchstartX;
+        
+        // التحقق من المسافة (أكبر من 60 بكسل) لتجنب اللمسات العادية
+        if (Math.abs(diffX) > 60) {
+            if (diffX < 0 && currentPageIndex < bookData.length - 1) {
+                // سحب لليسار -> الصفحة التالية
+                currentPageIndex++;
+                renderPagination();
+                renderCards();
+            } else if (diffX > 0 && currentPageIndex > 0) {
+                // سحب لليمين -> الصفحة السابقة
+                currentPageIndex--;
+                renderPagination();
+                renderCards();
+            }
+        }
+    };
+    
+    window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchend', handleTouchEnd, { passive: true });
+
     prevPageBtn.addEventListener('click', () => {
         if (currentPageIndex > 0) {
             currentPageIndex--;
