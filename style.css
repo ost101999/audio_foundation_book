@@ -906,11 +906,7 @@ body.teacher-mode .toggle-btn {
     }
 }
 
-@media (max-width: 479px) {
-    .words-grid.central-layout {
-        height: 100%;
-    }
-}
+
 
 .words-grid.central-layout .word-card {
     width: clamp(60px, 15vmin, 116px);
