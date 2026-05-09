@@ -1,3 +1,17 @@
+@font-face {
+    font-family: 'Sakkal Majalla';
+    src: url('majalla.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Sakkal Majalla';
+    src: url('majallab.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+
 :root {
     --primary-color: #4a90e2;
     --secondary-color: #f39c12;
@@ -757,32 +771,30 @@ body.teacher-mode .add-btn.teacher-only {
 }
 
 /* التنسيقات المخصصة للكمبيوتر فقط ووضع المعلم */
-@media (min-width: 480px) {
-    /* تمييز الكلمة (استروك فخم) */
-    .word-card.highlighted {
-        border: 3px solid var(--secondary-color);
-        box-shadow: 0 0 15px rgba(243, 156, 18, 0.3);
-        transform: scale(1.02);
-    }
+/* تمييز الكلمة (استروك فخم) */
+.word-card.highlighted {
+    border: 3px solid var(--secondary-color);
+    box-shadow: 0 0 15px rgba(243, 156, 18, 0.3);
+    transform: scale(1.02);
+}
 
-    /* التوزيع العمودي للكلمات القليلة */
-    .words-grid.vertical-layout {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        gap: 20px;
-        height: auto;
-        max-height: 80vh;
-    }
+/* التوزيع العمودي للكلمات القليلة */
+.words-grid.vertical-layout {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: clamp(10px, 3vh, 20px);
+    height: auto;
+    max-height: 80vh;
+}
 
-    .words-grid.vertical-layout .word-card {
-        width: 100%;
-        max-width: 350px;
-        margin: 0 auto;
-        aspect-ratio: auto;
-        padding: 10px;
-        font-size: clamp(2rem, 5vh, 3.5rem);
-    }
+.words-grid.vertical-layout .word-card {
+    width: 100%;
+    max-width: 350px;
+    margin: 0 auto;
+    aspect-ratio: auto;
+    padding: 10px;
+    font-size: clamp(1.5rem, 5vmin, 3.5rem);
 }
 
 /* إخفاء أزرار الكمبيوتر على الموبايل */
@@ -876,30 +888,41 @@ body.teacher-mode .toggle-btn {
 }
 
 /* التوزيع المركزي */
+/* التوزيع المركزي */
+.words-grid.central-layout {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; /* توسيط رأسي */
+    gap: 12px;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
 @media (min-width: 480px) {
     .words-grid.central-layout {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center; /* توسيط رأسي */
-        gap: 12px; /* المسافة الأصلية */
-        max-width: 500px; /* العرض الأصلي */
-        height: 500px; /* الارتفاع الأصلي للشبكة لجعل التوسيط الرأسي يعمل */
+        height: 500px;
         margin: 40px auto;
     }
+}
 
-    .words-grid.central-layout .word-card {
-        width: 116px; /* الحجم المحسوب للمربع الأصلي (500 - 36) / 4 */
-        height: 116px;
-        flex-shrink: 0;
+@media (max-width: 479px) {
+    .words-grid.central-layout {
+        height: 100%;
     }
+}
 
-    .grid-row-centered {
-        display: flex;
-        justify-content: center;
-        gap: 12px; /* المسافة الأصلية */
-        width: 100%;
-    }
+.words-grid.central-layout .word-card {
+    width: clamp(60px, 15vmin, 116px);
+    height: clamp(60px, 15vmin, 116px);
+    flex-shrink: 0;
+}
+
+.grid-row-centered {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    width: 100%;
 }
 
 /* إخفاء أزرار المعلم في وضع الطالب بدقة */
