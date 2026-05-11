@@ -149,7 +149,9 @@ async function persistBookJsonIfTeacher() {
 }
 
 // State Management
-let currentPageIndex = 0;
+const urlParams = new URLSearchParams(window.location.search);
+const pageParam = parseInt(urlParams.get('page'));
+let currentPageIndex = (!isNaN(pageParam) && pageParam > 0) ? pageParam - 1 : 0;
 let isTeacherMode = false;
 let mediaRecorder = null;
 let audioChunks = [];
