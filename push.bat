@@ -1,3 +1,5 @@
 @echo off
-start "" "%~dp0- push.ahk"
+git add .
+git commit -m "Auto Update"
+git push
 exit
