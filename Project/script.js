@@ -150,6 +150,11 @@ async function persistBookJsonIfTeacher() {
 
 // State Management
 const urlParams = new URLSearchParams(window.location.search);
+const isLocalHost = ['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+const hasTeacherParam = urlParams.has('teacher') || urlParams.has('record');
+const allowTeacherMode = isLocalHost || hasTeacherParam;
+document.body.classList.toggle('can-teach', allowTeacherMode);
+
 const pageParam = parseInt(urlParams.get('page'));
 let currentPageIndex = (!isNaN(pageParam) && pageParam > 0) ? pageParam - 1 : 0;
 let isTeacherMode = false;
@@ -441,7 +446,19 @@ function setupEventListeners() {
         });
     }
 
+    if (hasTeacherParam && modeToggle) {
+        isTeacherMode = true;
+        modeToggle.checked = true;
+        document.body.classList.toggle('teacher-mode', true);
+    }
+
     modeToggle.addEventListener('change', (e) => {
+        if (!allowTeacherMode) {
+            e.target.checked = false;
+            isTeacherMode = false;
+            document.body.classList.remove('teacher-mode');
+            return;
+        }
         isTeacherMode = e.target.checked;
         document.body.classList.toggle('teacher-mode', isTeacherMode);
         

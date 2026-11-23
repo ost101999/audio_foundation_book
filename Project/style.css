@@ -72,9 +72,13 @@ h1 {
 }
 
 .mode-controls {
-    display: flex;
+    display: none;
     align-items: center;
     gap: 10px;
+}
+
+body.can-teach .mode-controls {
+    display: flex;
 }
 
 /* Mode Switcher */
