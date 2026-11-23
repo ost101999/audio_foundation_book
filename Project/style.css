@@ -384,6 +384,7 @@ body.teacher-mode .add-btn.teacher-only {
 
 /* Cards */
 .word-card {
+    position: relative;
     background: var(--card-bg);
     border-radius: 12px;
     display: flex;
@@ -959,4 +960,83 @@ body.teacher-mode .teacher-controls.teacher-only {
     color: #ff7875;
     background: rgba(255, 77, 79, 0.1);
     transform: scale(1.1);
+}
+
+/* مؤشر وجود تسجيل صوتي (يظهر في وضع المعلم فقط) */
+body.teacher-mode .word-card.has-audio::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: #2ecc71;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.9);
+    pointer-events: none;
+}
+
+.modal-audio-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    flex-wrap: wrap;
+}
+
+.modal-btn.audio-play {
+    background: #eef6ff;
+    color: #2b6cb0;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+}
+
+.modal-btn.audio-play:hover:not(:disabled) {
+    background: #dcebff;
+}
+
+.modal-btn.danger {
+    background: #fff1f0;
+    color: #cf1322;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+}
+
+.modal-btn.danger:hover:not(:disabled) {
+    background: #ffccc7;
+}
+
+.modal-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.local-toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: rgba(30, 41, 59, 0.92);
+    color: #fff;
+    padding: 9px 18px;
+    border-radius: 999px;
+    font-family: 'Tajawal', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.18);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    z-index: 2000;
+}
+
+.local-toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.local-toast.error {
+    background: #c53030;
 }
