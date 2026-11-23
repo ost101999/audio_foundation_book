@@ -9,4 +9,4 @@ if errorlevel 1 (
   ping 127.0.0.1 -n 3 >nul
 )
 
-start http://localhost:5174/
+start http://localhost:5174/?teacher
